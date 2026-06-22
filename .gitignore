@@ -44,3 +44,8 @@ android/
 *.apk
 *.aab
 *.ipa
+.env.*
+credentials.json
+*.pem
+*.key
+.credentials
