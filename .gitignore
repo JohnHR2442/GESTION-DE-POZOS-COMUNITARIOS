@@ -1,82 +1,46 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# IDE and editors
-.idea/
-.vscode/
-
-# Dependencies
+# Dependencias
 node_modules/
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# Testing
-/coverage
-
-# Next.js
-/.next/
-/out/
-next-env.d.ts
-*.tsbuildinfo
-
-# Production builds
-/build
+.expo/
 dist/
-dist
-
-# Environment files (comprehensive coverage)
-
-*token.json*
-*credentials.json*
-
-# Logs and debug files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-dump.rdb
-
-# System files
-.DS_Store
-*.pem
+web-build/
+*.tsbuildinfo
 
 # Python
 __pycache__/
-*pyc*
-venv/
+*.py[cod]
+*.egg-info/
 .venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
 
-# Development tools
-chainlit.md
-.chainlit
-.ipynb_checkpoints/
-.ac
+# Variables de entorno
+.env
+*.env
+!.env.example
 
-# Deployment
-.vercel
+# Metro / cache
+.metro-cache/
+.metro-health-check*
 
-# Data and databases
-agenthub/agents/youtube/db
+# Logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
 
-# Archive files and large assets
-**/*.zip
-**/*.tar.gz
-**/*.tar
-**/*.tgz
-*.pack
-*.deb
-*.dylib
+# Sistema operativo
+.DS_Store
+Thumbs.db
 
-# Build caches
-.cache/
+# Editores
+.idea/
+*.swp
 
-memory/test_credentials.md
-
-# Mobile development
-android-sdk/
+# EAS / builds nativos
+ios/
+android/
+*.apk
+*.aab
+*.ipa
