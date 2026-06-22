@@ -1,0 +1,218 @@
+{
+  "app_name": "Turnos de Pozo",
+  "personality": "1 iOS-Native Clean (adapted for robust civic utility)",
+  "personality_one_liner": "A highly legible, command-center utility that balances iOS-native spaciousness with robust civic functionality and strong status visibility.",
+  "color": {
+    "light": {
+      "surface": "#F8FAFC",
+      "onSurface": "#0F172A",
+      "surfaceSecondary": "#FFFFFF",
+      "onSurfaceSecondary": "#0F172A",
+      "surfaceTertiary": "#F1F5F9",
+      "onSurfaceTertiary": "#334155",
+      "surfaceInverse": "#0F172A",
+      "onSurfaceInverse": "#F8FAFC",
+      "brand": "#0284C7",
+      "brandPrimary": "#0284C7",
+      "onBrandPrimary": "#FFFFFF",
+      "brandSecondary": "#E0F2FE",
+      "onBrandSecondary": "#0369A1",
+      "brandTertiary": "#F0F9FF",
+      "onBrandTertiary": "#0284C7",
+      "success": "#16A34A",
+      "onSuccess": "#FFFFFF",
+      "warning": "#F59E0B",
+      "onWarning": "#FFFFFF",
+      "error": "#DC2626",
+      "onError": "#FFFFFF",
+      "info": "#0284C7",
+      "onInfo": "#FFFFFF",
+      "border": "#E2E8F0",
+      "borderStrong": "#CBD5E1",
+      "divider": "#F1F5F9",
+      "well_isidro": "#0EA5E9",
+      "well_zapata": "#10B981",
+      "well_cardenas": "#F59E0B"
+    },
+    "dark": {
+      "surface": "#0F172A",
+      "onSurface": "#F1F5F9",
+      "surfaceSecondary": "#1E293B",
+      "onSurfaceSecondary": "#F8FAFC",
+      "surfaceTertiary": "#334155",
+      "onSurfaceTertiary": "#CBD5E1",
+      "surfaceInverse": "#F8FAFC",
+      "onSurfaceInverse": "#0F172A",
+      "brand": "#38BDF8",
+      "brandPrimary": "#38BDF8",
+      "onBrandPrimary": "#082F49",
+      "brandSecondary": "#0369A1",
+      "onBrandSecondary": "#E0F2FE",
+      "brandTertiary": "#0C4A6E",
+      "onBrandTertiary": "#38BDF8",
+      "success": "#22C55E",
+      "onSuccess": "#052E16",
+      "warning": "#FBBF24",
+      "onWarning": "#451A03",
+      "error": "#EF4444",
+      "onError": "#450A0A",
+      "info": "#38BDF8",
+      "onInfo": "#082F49",
+      "border": "#334155",
+      "borderStrong": "#475569",
+      "divider": "#1E293B",
+      "well_isidro": "#38BDF8",
+      "well_zapata": "#34D399",
+      "well_cardenas": "#FBBF24"
+    }
+  },
+  "typography": {
+    "displayFontFamily": "Inter",
+    "textFontFamily": "Inter",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous touch targets (56px minimum for buttons). High clarity for field use.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "1",
+  "navigation": "bottom_tabs",
+  "icon_set": "Feather",
+  "glassmorphism": {
+    "enabled": "true",
+    "do's": [
+      "Sticky headers over scrolling content",
+      "Bottom tab bar background",
+      "Bottom-sheet drag handles"
+    ],
+    "dont's": [
+      "Data-dense tables or calendars",
+      "Cards in list rows",
+      "Form inputs"
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler",
+    "charts": "react-native-chart-kit"
+  },
+  "screens": [
+    {
+      "name": "Login",
+      "purpose": "Secure entry point with visual indication of the selected well.",
+      "states": {
+        "loading": "Centered spinner on surface.",
+        "empty": "N/A",
+        "error": "Standard alert toast or banner above login form."
+      },
+      "layout": "Well selector at the top using large distinct cards (colored by well accents), followed by JWT form."
+    },
+    {
+      "name": "PublicView",
+      "purpose": "Read-only shift status and quick contact tap-to-call for the 9 socio members.",
+      "states": {
+        "loading": "Skeleton list of 9 members.",
+        "empty": "Illustration of well with 'No members found'.",
+        "error": "Error loading members with a retry button."
+      },
+      "layout": "Header with selected well color. List of 9 members. Distinct 'En turno' (green badge) vs 'Inactivo' (grey text). Phone numbers are large tap targets."
+    },
+    {
+      "name": "SocioDashboard (Inicio, Estadísticas, Historial, Perfil)",
+      "purpose": "Main command center for a well member.",
+      "states": {
+        "loading": "Skeleton cards and calendar grid.",
+        "empty": "No upcoming shifts illustration.",
+        "error": "Failed to load dashboard data."
+      },
+      "layout": "4 Bottom tabs. Inicio: Top KPI/Calendar showing the month's turns. Below calendar, large 56px action buttons for 'Emergencia' (3 options modal), 'Recorrido', 'Notificaciones', 'Multas'."
+    },
+    {
+      "name": "ContadorDashboard (Multas, Perfil)",
+      "purpose": "Accountant interface focused entirely on fines management.",
+      "states": {
+        "loading": "Skeleton list for fines.",
+        "empty": "Illustration of a clean slate 'No hay multas registradas'.",
+        "error": "Error loading fines with retry."
+      },
+      "layout": "2 Bottom tabs. Multas screen: List of fines using Accordion pattern. Collapsed: Name, amount, date, status badge. Expanded: Details and actions. Floating Action Button (FAB) at bottom right to create new fine."
+    },
+    {
+      "name": "Multas (Socio View)",
+      "purpose": "Read-only view of fines for a member.",
+      "states": {
+        "loading": "Skeleton list.",
+        "empty": "'No tienes multas' success illustration.",
+        "error": "Failed to load fines."
+      },
+      "layout": "Accordion list. Pagado (Green badge), No pagado (Red badge). Tap to open detail modal."
+    }
+  ],
+  "images": {
+    "well_isidro_bg": {
+      "url": "https://images.pexels.com/photos/355808/pexels-photo-355808.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "dark": "https://images.pexels.com/photos/355808/pexels-photo-355808.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Sky blue water texture for San Isidro well"
+    },
+    "well_zapata_bg": {
+      "url": "https://images.pexels.com/photos/14542854/pexels-photo-14542854.png?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "dark": "https://images.pexels.com/photos/14542854/pexels-photo-14542854.png?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Emerald green water texture for Zapata well"
+    },
+    "well_cardenas_bg": {
+      "url": "https://images.pexels.com/photos/7232655/pexels-photo-7232655.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "dark": "https://images.pexels.com/photos/7232655/pexels-photo-7232655.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Amber water droplets texture for Cardenas well"
+    },
+    "empty_fines": {
+      "url": "https://images.pexels.com/photos/16566547/pexels-photo-16566547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Water well community empty state"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Strictly apply Inter font and 56px minimum height to all Buttons and Pressables.",
+    "Implement Web specific layout constraint: Wrap the root app layout in a centered container with a maximum width of 480px. Apply a subtle box shadow to simulate a phone frame on web viewports. Background of the body outside this frame should be a neutral grey (e.g. #E2E8F0 in light, #0F172A in dark).",
+    "Use the exact provided hex codes for success (pagado) and error (no pagado) badges across Fines.",
+    "For the calendar, keep day cells large with high touch areas. Color code the day cells or markers based on the selected Well's accent color (Isidro=Sky Blue, Zapata=Emerald Green, Cardenas=Amber).",
+    "Accordion UI for fines: Collapsed row shows Fine type, amount, date, and status. Tap to expand and show full details. Use appropriate ARIA roles or accessible states where applicable.",
+    "Contador view features a Floating Action Button (FAB) +Nueva Multa pinned to the bottom right, clearing the scrolling list padding.",
+    "For multi-tenant separation, ensure the login screen visually highlights the selected well using its accent color.",
+    "Use `react-native-chart-kit` for the Estadísticas tab, ensuring chart colors use the brandPrimary or specific well accent colors to remain visually consistent.",
+    "Render image backgrounds with a gradient scrim behind text to ensure readability, especially for well-selection cards."
+  ],
+  "haptics": {
+    "button_press": "light",
+    "tab_switch": "light",
+    "accordion_toggle": "light",
+    "fab_press": "medium",
+    "calendar_day_select": "light",
+    "success_action": "success",
+    "error_action": "error"
+  }
+}
