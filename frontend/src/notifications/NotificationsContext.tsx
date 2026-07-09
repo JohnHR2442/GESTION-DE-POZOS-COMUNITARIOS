@@ -100,6 +100,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     (async () => {
       const saved = await storage.getItem<string>(LAST_SEEN_KEY, "");
       lastSeenRef.current = saved || new Date().toISOString();
+      registerForPush(user.id);
       await reload();
       await poll();
     })();
