@@ -77,7 +77,7 @@ export default function Login() {
           testID="input-email"
           value={email}
           onChangeText={setEmail}
-          placeholder={pozo ? `correo@${pozo.dominio}` : "tu correo"}
+          placeholder="Escribe tu correo"
           placeholderTextColor={colors.muted}
           autoCapitalize="none"
           keyboardType="email-address"
@@ -90,7 +90,7 @@ export default function Login() {
             testID="input-password"
             value={password}
             onChangeText={setPassword}
-            placeholder="pozo2026"
+            placeholder="Escribe tu contrasena"
             placeholderTextColor={colors.muted}
             secureTextEntry={!showPass}
             style={[styles.passInput, { color: colors.onSurface }]}
@@ -104,7 +104,6 @@ export default function Login() {
         {error ? <Text style={[styles.error, { color: colors.error }]} testID="login-error">{error}</Text> : null}
 
         <Button title="Entrar" testID="btn-login" onPress={handleLogin} loading={loading} color={accent} style={{ marginTop: spacing.lg }} />
-        <Text style={[styles.hint, { color: colors.muted }]}>Contrasena por defecto: pozo2026</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
