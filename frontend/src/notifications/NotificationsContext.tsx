@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import { api } from "@/src/api/client";
 import { storage } from "@/src/utils/storage";
 import { useAuth } from "@/src/auth/AuthContext";
+import { registerForPush } from "./registerPush";
 
 export interface Notif {
   id: string;
