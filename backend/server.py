@@ -238,10 +238,14 @@ async def get_socios_ordenados(pozo_id: str) -> List[dict]:
     return await cursor.to_list(length=20)
 
 
-def socio_en_turno_index(target: date) -> int:
-    if target < SEASON_START:
+def pozo_inicio(pozo: dict) -> date:
+    return date.fromisoformat(pozo.get("inicio", SEASON_START.isoformat()))
+
+
+def socio_en_turno_index(target: date, start: date = SEASON_START) -> int:
+    if target < start:
         return -1
-    delta = (target - SEASON_START).days
+    delta = (target - start).days
     return delta % 9
 
 
@@ -254,6 +258,7 @@ POZOS_SEED = [
         "nombre": "San Isidro",
         "dominio": "isidro.com",
         "accent": "#0EA5E9",
+        "inicio": "2026-01-06",
         "festivos": ["01-01", "02-12", "03-19", "05-15", "09-15", "11-01", "11-02", "12-12", "12-25"],
         "socios": [
             ("Alfredo Velez", "2231159370", "alfredo.velez@isidro.com"),
@@ -272,6 +277,7 @@ POZOS_SEED = [
         "nombre": "Zapata",
         "dominio": "zapata.com",
         "accent": "#10B981",
+        "inicio": "2026-02-01",
         "festivos": ["01-01", "02-12", "03-19", "08-08", "09-15", "11-01", "11-02", "12-12", "12-25"],
         "socios": [
             ("Jorge Velez", "2231152247", "jorge.velez@zapata.com"),
@@ -290,6 +296,7 @@ POZOS_SEED = [
         "nombre": "Cardenas",
         "dominio": "cardenas.com",
         "accent": "#F59E0B",
+        "inicio": "2026-02-01",
         "festivos": ["01-01", "02-12", "03-19", "05-21", "09-15", "11-01", "11-02", "12-12", "12-25"],
         "socios": [
             ("Antonio Jimenez", "2231153256", "antonio.jimenez@cardenas.com"),
@@ -307,12 +314,10 @@ POZOS_SEED = [
 
 
 async def seed_database():
-    existing = await db.pozos.count_documents({})
-    if existing >= 3:
-        logger.info("Seed: datos ya presentes, se omite")
-        return
     default_hash = hash_password(DEFAULT_PASSWORD)
     for pozo in POZOS_SEED:
+        # Metadatos del pozo: siempre se sincronizan (idempotente), asi el
+        # campo "inicio" queda actualizado aunque los usuarios ya existan.
         await db.pozos.update_one(
             {"id": pozo["id"]},
             {"$set": {
@@ -321,7 +326,7 @@ async def seed_database():
                 "dominio": pozo["dominio"],
                 "accent": pozo["accent"],
                 "festivos": pozo["festivos"],
-                "inicio": SEASON_START.isoformat(),
+                "inicio": pozo["inicio"],
             }},
             upsert=True,
         )
@@ -461,7 +466,8 @@ async def public_socios(pozo_id: str):
     socios = await get_socios_ordenados(pozo_id)
     if not socios:
         raise HTTPException(status_code=404, detail="Pozo no encontrado")
-    turno_idx = socio_en_turno_index(date.today())
+    pozo = await db.pozos.find_one({"id": pozo_id})
+    turno_idx = socio_en_turno_index(date.today(), pozo_inicio(pozo))
     result = []
     for s in socios:
         en_turno = (s.get("orden") == turno_idx + 1) if turno_idx >= 0 else False
@@ -480,7 +486,8 @@ async def turno_hoy(pozo_id: str):
     socios = await get_socios_ordenados(pozo_id)
     if not socios:
         raise HTTPException(status_code=404, detail="Pozo no encontrado")
-    idx = socio_en_turno_index(date.today())
+    pozo = await db.pozos.find_one({"id": pozo_id})
+    idx = socio_en_turno_index(date.today(), pozo_inicio(pozo))
     if idx < 0:
         return {"socio": None, "fecha": date.today().isoformat()}
     socio = next((s for s in socios if s.get("orden") == idx + 1), None)
@@ -499,6 +506,7 @@ async def calendario(year: int, month: int, user=Depends(get_current_user)):
     socios = await get_socios_ordenados(pozo_id)
     pozo = await db.pozos.find_one({"id": pozo_id})
     festivos = set(festivos_for_year(pozo.get("festivos", []), year))
+    inicio = pozo_inicio(pozo)
     # dias sin servicio (manual)
     dss_cursor = db.dias_sin_servicio.find({"pozo_id": pozo_id})
     dss_docs = await dss_cursor.to_list(length=500)
@@ -508,7 +516,7 @@ async def calendario(year: int, month: int, user=Depends(get_current_user)):
     d = date(year, month, 1)
     dias = []
     while d.month == month:
-        idx = socio_en_turno_index(d)
+        idx = socio_en_turno_index(d, inicio)
         socio = next((s for s in socios if s.get("orden") == idx + 1), None) if idx >= 0 else None
         iso = d.isoformat()
         es_festivo = iso in festivos
@@ -774,10 +782,12 @@ async def estadisticas(user=Depends(get_current_user)):
     # turnos del socio en el ano actual (conteo aproximado de dias asignados)
     mis_turnos = 0
     if user.get("orden"):
-        d = SEASON_START
-        end = date(SEASON_START.year, 12, 31)
+        pozo = await db.pozos.find_one({"id": pozo_id})
+        inicio = pozo_inicio(pozo)
+        d = inicio
+        end = date(inicio.year, 12, 31)
         while d <= end:
-            if socio_en_turno_index(d) == user["orden"] - 1:
+            if socio_en_turno_index(d, inicio) == user["orden"] - 1:
                 mis_turnos += 1
             d += timedelta(days=1)
 
@@ -813,6 +823,7 @@ async def estadisticas(user=Depends(get_current_user)):
 async def historial(year: int, month: int, user=Depends(get_current_user)):
     pozo = await db.pozos.find_one({"id": user["pozo_id"]})
     festivos = set(festivos_for_year(pozo.get("festivos", []), year))
+    inicio = pozo_inicio(pozo)
     dss_docs = await db.dias_sin_servicio.find({"pozo_id": user["pozo_id"]}).to_list(length=500)
     dias_sin = {d["fecha"]: d.get("motivo") for d in dss_docs}
     orden = user.get("orden")
@@ -820,7 +831,7 @@ async def historial(year: int, month: int, user=Depends(get_current_user)):
     if orden:
         d = date(year, month, 1)
         while d.month == month:
-            if socio_en_turno_index(d) == orden - 1:
+            if socio_en_turno_index(d, inicio) == orden - 1:
                 iso = d.isoformat()
                 dias.append({
                     "fecha": iso,
