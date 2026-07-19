@@ -104,6 +104,9 @@ export default function Login() {
         {error ? <Text style={[styles.error, { color: colors.error }]} testID="login-error">{error}</Text> : null}
 
         <Button title="Entrar" testID="btn-login" onPress={handleLogin} loading={loading} color={accent} style={{ marginTop: spacing.lg }} />
+        <Pressable onPress={() => router.push("/recuperar")} testID="btn-forgot" style={styles.forgot} hitSlop={8}>
+          <Text style={[styles.forgotText, { color: accent }]}>Se me olvido la contrasena</Text>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -123,4 +126,6 @@ const styles = StyleSheet.create({
   passInput: { flex: 1, fontSize: fontSize.lg },
   error: { marginTop: spacing.md, fontSize: fontSize.base, fontWeight: "600" },
   hint: { textAlign: "center", marginTop: spacing.lg, fontSize: fontSize.sm },
+  forgot: { alignSelf: "center", marginTop: spacing.lg, padding: spacing.sm },
+  forgotText: { fontSize: fontSize.base, fontWeight: "700" },
 });

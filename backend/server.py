@@ -14,6 +14,9 @@ from jose import JWTError, jwt
 from dotenv import load_dotenv
 import bcrypt
 import httpx
+import secrets
+import aiosmtplib
+from email.message import EmailMessage
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -34,6 +37,10 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = 60 * 24 * 7
 DEFAULT_PASSWORD = "pozo2026"
 SEASON_START = date(2026, 2, 1)
+
+GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
+GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
+RESET_CODE_TTL_MIN = 15
 
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
@@ -63,6 +70,28 @@ async def send_push(recipients: List[str], titulo: str, mensaje: str):
         payload = {"recipients": chunk, "data": {"title": titulo, "message": mensaje}}
         resp = await _push_client.post("/api/v1/push/trigger", json=payload)
         resp.raise_for_status()
+
+
+async def send_reset_email(socio_email: str, code: str):
+    """Envia el codigo de recuperacion al correo del comisariado."""
+    msg = EmailMessage()
+    msg["From"] = GMAIL_ADDRESS
+    msg["To"] = GMAIL_ADDRESS
+    msg["Subject"] = f"Codigo de recuperacion - {socio_email}"
+    msg.set_content(
+        f"El socio {socio_email} solicito recuperar su contrasena.\n\n"
+        f"Codigo de un solo uso: {code}\n"
+        f"Vigencia: {RESET_CODE_TTL_MIN} minutos.\n\n"
+        f"Entrega este codigo unicamente al socio que lo solicito."
+    )
+    await aiosmtplib.send(
+        msg,
+        hostname="smtp.gmail.com",
+        port=587,
+        start_tls=True,
+        username=GMAIL_ADDRESS,
+        password=GMAIL_APP_PASSWORD,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -186,6 +215,21 @@ class RegisterPushBody(BaseModel):
     user_id: str
     platform: str  # "android" | "ios"
     device_token: str
+
+
+class ResetRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetVerify(BaseModel):
+    email: EmailStr
+    code: str
+
+
+class ResetConfirm(BaseModel):
+    email: EmailStr
+    code: str
+    new_password: str = Field(min_length=6)
 
 
 # ---------------------------------------------------------------------------
@@ -449,6 +493,68 @@ async def register_push(body: RegisterPushBody):
         raise HTTPException(502, "Servicio de push no disponible")
     resp.raise_for_status()
     return {"status": "registered"}
+
+
+async def _find_valid_reset(email: str, code: str):
+    doc = await db.password_resets.find_one({"email": email, "used": False})
+    if not doc:
+        return None
+    expires = datetime.fromisoformat(doc["expires_at"])
+    if expires < now_utc():
+        return None
+    if not verify_password(code, doc["code_hash"]):
+        return None
+    return doc
+
+
+@api.post("/auth/reset/request")
+async def reset_request(req: ResetRequest):
+    email = req.email.lower().strip()
+    user = await db.usuarios.find_one({"email": email})
+    if not user:
+        raise HTTPException(status_code=404, detail="Ese correo no esta registrado")
+    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
+        raise HTTPException(status_code=500, detail="El correo de recuperacion no esta configurado")
+    # invalida codigos previos
+    await db.password_resets.delete_many({"email": email})
+    code = f"{secrets.randbelow(10 ** 6):06d}"
+    doc = {
+        "email": email,
+        "code_hash": hash_password(code),
+        "expires_at": (now_utc() + timedelta(minutes=RESET_CODE_TTL_MIN)).isoformat(),
+        "used": False,
+        "created_at": now_utc().isoformat(),
+    }
+    await db.password_resets.insert_one(doc)
+    try:
+        await send_reset_email(email, code)
+    except Exception as e:
+        logger.error(f"Error enviando correo de recuperacion: {e}")
+        raise HTTPException(status_code=502, detail="No se pudo enviar el codigo. Intenta de nuevo.")
+    return {"detail": "Se envio un codigo al comisariado."}
+
+
+@api.post("/auth/reset/verify")
+async def reset_verify(req: ResetVerify):
+    email = req.email.lower().strip()
+    doc = await _find_valid_reset(email, req.code.strip())
+    if not doc:
+        raise HTTPException(status_code=400, detail="Codigo invalido o expirado")
+    return {"valid": True}
+
+
+@api.post("/auth/reset/confirm")
+async def reset_confirm(req: ResetConfirm):
+    email = req.email.lower().strip()
+    doc = await _find_valid_reset(email, req.code.strip())
+    if not doc:
+        raise HTTPException(status_code=400, detail="Codigo invalido o expirado")
+    await db.usuarios.update_one(
+        {"email": email},
+        {"$set": {"hashed_password": hash_password(req.new_password)}},
+    )
+    await db.password_resets.delete_many({"email": email})
+    return {"detail": "Contrasena actualizada. Ya puedes iniciar sesion."}
 
 
 # ---------------------------------------------------------------------------
