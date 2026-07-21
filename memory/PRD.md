@@ -39,6 +39,12 @@ MXN, fechas DD/MM/YYYY. Codigo limpio sin trazas de Emergent/IA.
   iniciar.bat, configurar-firewall.bat. Tests pytest (18 pasan).
 - Validado por testing agent: 18/18 backend, flujos web OK, sin issues bloqueantes.
 
+## Implementado (actualizaciones posteriores)
+- Notificaciones push nativas (Emergent-managed): registro de dispositivo, envio en eventos, listeners de tap; app.json con package com.turnosdepozo.app, plugin expo-notifications y googleServicesFile. Requiere deploy + build + google-services.json.
+- Rotacion de turnos por-pozo: San Isidro inicia 2026-01-06 (Jose Isabel Huerta cae viernes 17-jul-2026); Zapata y Cardenas 2026-02-01. Sincronizacion idempotente en startup.
+- Login endurecido: se quitaron placeholders/hint que revelaban la contrasena por defecto.
+- Recuperacion de contrasena (3 pasos): correo del socio -> codigo 6 digitos enviado por Gmail SMTP al comisariado (comissariadocarpinteros@gmail.com, mismo para 3 pozos) -> nueva contrasena. Codigo single-use, expira 15 min, hasheado. Endpoints /auth/reset/request|verify|confirm.
+
 ## Backlog / pendientes
 - P1: Permitir al contador exportar reporte de multas a PDF.
 - P1: Filtros/busqueda en lista de multas del contador.
