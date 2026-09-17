@@ -13,7 +13,6 @@ from bson import ObjectId
 from jose import JWTError, jwt
 from dotenv import load_dotenv
 import bcrypt
-import httpx
 import secrets
 import aiosmtplib
 from email.message import EmailMessage
@@ -47,29 +46,6 @@ db = client[DB_NAME]
 
 app = FastAPI(title="Turnos de Pozo API")
 api = APIRouter(prefix="/api")
-
-# ---------------------------------------------------------------------------
-# Push notifications (servicio administrado por Emergent)
-# ---------------------------------------------------------------------------
-PUSH_BASE_URL = "https://integrations.emergentagent.com"
-PUSH_KEY = os.environ.get("EMERGENT_PUSH_KEY", "placeholder")
-_push_client = httpx.AsyncClient(
-    base_url=PUSH_BASE_URL,
-    headers={"X-Push-Key": PUSH_KEY},
-    timeout=10.0,
-)
-
-
-async def send_push(recipients: List[str], titulo: str, mensaje: str):
-    """Envia una push a una lista de user_id via el relay de Emergent."""
-    recipients = [r for r in recipients if r]
-    if not recipients:
-        return
-    for i in range(0, len(recipients), 100):
-        chunk = recipients[i:i + 100]
-        payload = {"recipients": chunk, "data": {"title": titulo, "message": mensaje}}
-        resp = await _push_client.post("/api/v1/push/trigger", json=payload)
-        resp.raise_for_status()
 
 
 async def send_reset_email(socio_email: str, code: str):
@@ -205,16 +181,6 @@ class DiaSinServicioCreate(BaseModel):
 
 class EmergenciaCreate(BaseModel):
     tipo: str  # tuberia | hidrante | presion
-
-
-class PushTokenRequest(BaseModel):
-    token: str
-
-
-class RegisterPushBody(BaseModel):
-    user_id: str
-    platform: str  # "android" | "ios"
-    device_token: str
 
 
 class ResetRequest(BaseModel):
@@ -422,16 +388,6 @@ async def crear_notificacion(pozo_id: str, tipo: str, titulo: str, mensaje: str,
         "leida_por": [],
     }
     await db.notificaciones.insert_one(doc)
-    # Envio de push (no bloquea la operacion principal si falla)
-    try:
-        if destinatario == "todos":
-            users = await db.usuarios.find({"pozo_id": pozo_id}).to_list(length=50)
-            recipients = [u["id"] for u in users]
-        else:
-            recipients = [destinatario]
-        await send_push(recipients, titulo, mensaje)
-    except Exception as e:
-        logger.warning(f"Push fallo (no bloqueante): {e}")
     return doc
 
 
@@ -476,23 +432,6 @@ async def change_password(req: ChangePasswordRequest, user=Depends(get_current_u
         {"$set": {"hashed_password": hash_password(req.new_password)}},
     )
     return {"detail": "Contrasena actualizada correctamente"}
-
-
-@api.post("/auth/push-token")
-async def save_push_token(req: PushTokenRequest, user=Depends(get_current_user)):
-    await db.usuarios.update_one({"id": user["id"]}, {"$set": {"push_token": req.token}})
-    return {"detail": "Token guardado"}
-
-
-@api.post("/register-push", status_code=201)
-async def register_push(body: RegisterPushBody):
-    resp = await _push_client.post("/api/v1/push/users/register", json=body.model_dump())
-    if resp.status_code == 401:
-        raise HTTPException(500, "EMERGENT_PUSH_KEY faltante o invalida")
-    if resp.status_code >= 500:
-        raise HTTPException(502, "Servicio de push no disponible")
-    resp.raise_for_status()
-    return {"status": "registered"}
 
 
 async def _find_valid_reset(email: str, code: str):

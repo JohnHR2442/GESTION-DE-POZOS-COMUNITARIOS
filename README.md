@@ -94,20 +94,12 @@ eas build -p android --profile preview
 ```
 El perfil `preview` genera un APK instalable. El archivo `eas.json` ya esta configurado.
 
-## Notificaciones push en el celular (Android)
+## Notificaciones
 
-Las notificaciones push nativas SOLO funcionan en la app compilada (no en Expo Go ni
-en web) y requieren:
-
-1. **Firebase**: crea un proyecto en https://console.firebase.google.com, agrega una app
-   Android con el paquete `com.turnosdepozo.app`, descarga el archivo
-   **`google-services.json`** y colocalo en la carpeta `frontend/`.
-2. **Backend desplegado**: el backend debe estar publicado en internet para poder enviar
-   las push (la variable `EMERGENT_PUSH_KEY` se asigna automaticamente en el deploy).
-3. **Build de produccion**: `eas build -p android --profile production`.
-
-En web, las notificaciones ya funcionan mediante la Notification API del navegador y el
-sondeo cada 30s (no requieren nada de lo anterior).
+- **Web (navegador):** funcionan mediante la Notification API del navegador y el sondeo
+  cada 30s al endpoint `/api/notificaciones/pendientes`.
+- **Movil:** dentro de la app se muestran avisos locales cuando esta abierta, ademas de la
+  campana con el contador de no leidas. No se utiliza ningun servicio externo de push.
 
 ## Configuracion del Firewall de Windows
 

@@ -3,7 +3,6 @@ import { Platform } from "react-native";
 import { api } from "@/src/api/client";
 import { storage } from "@/src/utils/storage";
 import { useAuth } from "@/src/auth/AuthContext";
-import { registerForPush } from "./registerPush";
 
 export interface Notif {
   id: string;
@@ -101,7 +100,6 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     (async () => {
       const saved = await storage.getItem<string>(LAST_SEEN_KEY, "");
       lastSeenRef.current = saved || new Date().toISOString();
-      registerForPush(user.id);
       await reload();
       await poll();
     })();
