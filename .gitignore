@@ -1,0 +1,51 @@
+# Dependencias
+node_modules/
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Variables de entorno
+.env
+*.env
+!.env.example
+
+# Metro / cache
+.metro-cache/
+.metro-health-check*
+
+# Logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.idea/
+*.swp
+
+# EAS / builds nativos
+ios/
+android/
+*.apk
+*.aab
+*.ipa
+.env.*
+credentials.json
+*.pem
+*.key
+.credentials
