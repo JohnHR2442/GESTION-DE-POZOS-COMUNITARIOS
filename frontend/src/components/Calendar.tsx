@@ -59,14 +59,9 @@ export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) 
           if (!d) return <View key={`e${i}`} style={styles.cell} />;
           const isMine = highlightSocioId && d.socio_id === highlightSocioId;
           const isToday = d.fecha === todayIso;
-          const bg = d.sin_servicio
-            ? colors.errorSoft
-            : d.festivo
-            ? colors.surfaceTertiary
-            : isMine
-            ? accent
-            : colors.surfaceSecondary;
-          const fg = isMine && !d.sin_servicio && !d.festivo ? "#FFFFFF" : colors.onSurface;
+          const outOfService = d.sin_servicio || d.festivo;
+          const bg = outOfService ? colors.errorSoft : colors.surfaceSecondary;
+          const fg = colors.onSurface;
           return (
             <Pressable
               key={d.fecha}
@@ -83,9 +78,9 @@ export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) 
               ]}
             >
               <Text style={[styles.dayNum, { color: fg }]}>{d.dia}</Text>
-              {d.sin_servicio ? (
+              {outOfService ? (
                 <View style={[styles.dot, { backgroundColor: colors.error }]} />
-              ) : !isMine && d.socio_nombre ? (
+              ) : isMine ? (
                 <View style={[styles.dot, { backgroundColor: accent }]} />
               ) : null}
             </Pressable>

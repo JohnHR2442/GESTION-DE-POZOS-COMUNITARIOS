@@ -131,11 +131,16 @@ def computus(year: int) -> date:
 
 
 def easter_holidays(year: int) -> List[str]:
-    """Jueves Santo and Viernes Santo (Holy Thursday and Good Friday)."""
+    """Viernes de Dolores, Viernes Santo y Sabado de Gloria."""
     easter = computus(year)
-    jueves = easter - timedelta(days=3)
-    viernes = easter - timedelta(days=2)
-    return [jueves.strftime("%m-%d"), viernes.strftime("%m-%d")]
+    dolores = easter - timedelta(days=9)         # Viernes de Dolores
+    viernes_santo = easter - timedelta(days=2)   # Viernes Santo
+    sabado_gloria = easter - timedelta(days=1)   # Sabado de Gloria
+    return [
+        dolores.strftime("%m-%d"),
+        viernes_santo.strftime("%m-%d"),
+        sabado_gloria.strftime("%m-%d"),
+    ]
 
 
 def festivos_for_year(base_festivos: List[str], year: int) -> List[str]:
@@ -268,8 +273,8 @@ POZOS_SEED = [
         "nombre": "San Isidro",
         "dominio": "isidro.com",
         "accent": "#0EA5E9",
-        "inicio": "2026-01-06",
-        "festivos": ["01-01", "02-12", "03-19", "05-15", "09-15", "11-01", "11-02", "12-12", "12-25"],
+        "inicio": "2026-01-08",
+        "festivos": ["01-01", "02-12", "03-19", "09-15", "11-01", "11-02", "12-12", "12-25"],
         "socios": [
             ("Alfredo Velez", "2231159370", "alfredo.velez@isidro.com"),
             ("Simon Meneses", "2231223120", "simon.meneses@isidro.com"),
