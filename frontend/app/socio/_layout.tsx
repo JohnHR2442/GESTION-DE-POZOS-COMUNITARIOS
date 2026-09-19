@@ -36,6 +36,7 @@ export default function SocioLayout() {
       <Tabs.Screen name="historial" options={{ title: "Historial", tabBarIcon: ({ color, size }) => <Feather name="calendar" size={size} color={color} /> }} />
       <Tabs.Screen name="perfil" options={{ title: "Perfil", tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} /> }} />
       <Tabs.Screen name="multas" options={{ href: null }} />
+      <Tabs.Screen name="agua-sobra" options={{ href: null }} />
     </Tabs>
   );
 }

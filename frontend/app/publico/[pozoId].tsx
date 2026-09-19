@@ -18,6 +18,7 @@ interface SocioPublico {
   telefono: string | null;
   orden: number;
   en_turno: boolean;
+  horas_sobra: number;
 }
 
 export default function PublicView() {
@@ -116,6 +117,11 @@ export default function PublicView() {
                 ) : (
                   <Text style={[styles.inactivo, { color: colors.muted }]}>Inactivo</Text>
                 )}
+                {item.horas_sobra > 0 ? (
+                  <Text style={[styles.horasSobra, { color: colors.error }]} testID={`horas-sobra-${item.orden}`}>
+                    Horas de sobra: {item.horas_sobra}
+                  </Text>
+                ) : null}
               </View>
               {item.telefono ? (
                 <Pressable onPress={() => handleCall(item)} style={[styles.callBtn, { backgroundColor: accent }]} testID={`call-${item.orden}`}>
@@ -147,6 +153,7 @@ const styles = StyleSheet.create({
   turnoBadge: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill, marginTop: 4 },
   turnoText: { fontSize: fontSize.sm, fontWeight: "700" },
   inactivo: { fontSize: fontSize.base, marginTop: 4 },
+  horasSobra: { fontSize: fontSize.sm, fontWeight: "700", marginTop: 4 },
   callBtn: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
   modalName: { fontSize: fontSize.xl, fontWeight: "700", textAlign: "center" },
   modalPhone: { fontSize: fontSize.xxl, fontWeight: "800", textAlign: "center", marginTop: spacing.sm },

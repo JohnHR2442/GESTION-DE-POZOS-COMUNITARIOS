@@ -107,6 +107,7 @@ export default function SocioInicio() {
     { key: "recorrido", label: "Recorrido", icon: "map", color: accent, onPress: () => setShowRecorrido(true) },
     { key: "notificaciones", label: "Notificaciones", icon: "bell", color: colors.warning, onPress: () => setShowNotif(true) },
     { key: "multas", label: "Multas", icon: "file-text", color: colors.brand, onPress: () => router.push("/socio/multas") },
+    { key: "agua-sobra", label: "Agua de sobra", icon: "droplet", color: colors.success, onPress: () => router.push("/socio/agua-sobra") },
   ];
 
   return (

@@ -203,6 +203,10 @@ class ResetConfirm(BaseModel):
     new_password: str = Field(min_length=6)
 
 
+class AguaSobraBody(BaseModel):
+    horas: int = Field(ge=1, le=24)
+
+
 # ---------------------------------------------------------------------------
 # Auth dependencies
 # ---------------------------------------------------------------------------
@@ -374,6 +378,7 @@ async def seed_database():
                     "hashed_password": default_hash,
                     "is_active": True,
                     "push_token": None,
+                    "horas_sobra": 0,
                 })
     logger.info("Seed: base de datos inicializada")
 
@@ -527,6 +532,7 @@ async def public_socios(pozo_id: str):
             "telefono": s.get("telefono"),
             "orden": s.get("orden"),
             "en_turno": en_turno,
+            "horas_sobra": s.get("horas_sobra", 0),
         })
     return result
 
@@ -752,6 +758,33 @@ async def borrar_multa(multa_id: str, user=Depends(require_contador)):
 async def list_socios(user=Depends(get_current_user)):
     socios = await get_socios_ordenados(user["pozo_id"])
     return [{"id": s["id"], "nombre": s["nombre"], "orden": s.get("orden")} for s in socios]
+
+
+@api.get("/agua-sobra/mias")
+async def mis_horas_sobra(user=Depends(get_current_user)):
+    u = await db.usuarios.find_one({"id": user["id"]})
+    return {"horas_sobra": u.get("horas_sobra", 0)}
+
+
+@api.post("/agua-sobra/agregar")
+async def agregar_horas_sobra(body: AguaSobraBody, user=Depends(get_current_user)):
+    u = await db.usuarios.find_one({"id": user["id"]})
+    nuevo = u.get("horas_sobra", 0) + body.horas
+    await db.usuarios.update_one({"id": user["id"]}, {"$set": {"horas_sobra": nuevo}})
+    pozo = await db.pozos.find_one({"id": user["pozo_id"]})
+    await crear_notificacion(
+        user["pozo_id"], "agua_sobra", "Horas de sobra",
+        f"Pozo {pozo['nombre']} indico que tiene horas de sobra.",
+    )
+    return {"horas_sobra": nuevo}
+
+
+@api.post("/agua-sobra/quitar")
+async def quitar_horas_sobra(body: AguaSobraBody, user=Depends(get_current_user)):
+    u = await db.usuarios.find_one({"id": user["id"]})
+    nuevo = max(0, u.get("horas_sobra", 0) - body.horas)
+    await db.usuarios.update_one({"id": user["id"]}, {"$set": {"horas_sobra": nuevo}})
+    return {"horas_sobra": nuevo}
 
 
 # ---------------------------------------------------------------------------

@@ -13,6 +13,7 @@ const ICONS: Record<string, any> = {
   sin_servicio: "slash",
   multa: "dollar-sign",
   turno: "clock",
+  agua_sobra: "droplet",
 };
 
 export function NotificacionesModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
