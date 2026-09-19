@@ -23,7 +23,12 @@ export async function getInstallationId(): Promise<string> {
  * Devuelve null en web o si el usuario no concede permiso.
  */
 async function obtenerToken(): Promise<string | null> {
-  if (Platform.OS === "web") return null;
+  if (Platform.OS === "web") {
+    // Token sintetico: el backend lo ignora para el envio real (no empieza con
+    // "ExponentPushToken"), pero permite seguir/dejar pozos desde la web.
+    const installation_id = await getInstallationId();
+    return `web:${installation_id}`;
+  }
   try {
     const Notifications = await import("expo-notifications");
     const actual = await Notifications.getPermissionsAsync();
@@ -52,7 +57,6 @@ async function obtenerToken(): Promise<string | null> {
  * Se llama al iniciar sesion y al abrir la app.
  */
 export async function registrarPush(pozoIds: string[] = [], userId?: string | null) {
-  if (Platform.OS === "web") return;
   const token = await obtenerToken();
   if (!token) return;
   const installation_id = await getInstallationId();
@@ -70,7 +74,6 @@ export async function registrarPush(pozoIds: string[] = [], userId?: string | nu
 
 /** Empieza a seguir un pozo desde la vista publica. */
 export async function seguirPozo(pozoId: string): Promise<boolean> {
-  if (Platform.OS === "web") return false;
   const token = await obtenerToken();
   const installation_id = await getInstallationId();
   if (!token) return false; // sin permiso no tiene sentido seguir

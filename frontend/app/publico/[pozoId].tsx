@@ -38,7 +38,6 @@ export default function PublicView() {
   const [avisoSeguir, setAvisoSeguir] = useState(false);
 
   useEffect(() => {
-    if (Platform.OS === "web") return;
     (async () => {
       const pozos = await estadoPozos();
       setSiguiendo(pozos.includes(pozoId as string));
@@ -111,11 +110,9 @@ export default function PublicView() {
           <Text style={styles.headerTitle}>Pozo {pozoNombre}</Text>
           <Text style={styles.headerSub}>Socios y turno actual</Text>
         </View>
-        {Platform.OS !== "web" ? (
-          <Pressable onPress={toggleSeguir} hitSlop={10} testID="public-follow" style={{ marginRight: spacing.sm }}>
-            <Feather name={siguiendo ? "bell" : "bell-off"} size={20} color="#FFFFFF" />
-          </Pressable>
-        ) : null}
+        <Pressable onPress={toggleSeguir} hitSlop={10} testID="public-follow" style={{ marginRight: spacing.sm }}>
+          <Feather name={siguiendo ? "bell" : "bell-off"} size={20} color="#FFFFFF" />
+        </Pressable>
         <Pressable onPress={onRefresh} hitSlop={10} testID="public-refresh">
           <Feather name="refresh-cw" size={20} color="#FFFFFF" />
         </Pressable>
@@ -168,7 +165,7 @@ export default function PublicView() {
       <AppModal visible={avisoSeguir} onClose={() => setAvisoSeguir(false)} title="Avisos activados" testID="follow-modal">
         <Text style={[styles.modalName, { color: colors.onSurface }]}>Pozo {pozoNombre}</Text>
         <Text style={[styles.followText, { color: colors.muted }]}>
-          Ahora recibiras avisos de este pozo en tu telefono: emergencias, multas, recorridos, horas de sobra y dias festivos.
+          Ahora recibiras los avisos de este pozo: emergencias, multas, recorridos, horas de sobra y dias festivos. En el telefono llegaran como notificacion.
         </Text>
         <Button title="Entendido" onPress={() => setAvisoSeguir(false)} icon={<Feather name="check" size={18} color="#FFFFFF" />} style={{ marginTop: spacing.lg }} />
       </AppModal>
