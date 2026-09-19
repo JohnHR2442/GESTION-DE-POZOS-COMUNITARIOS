@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { api, TOKEN_KEY } from "@/src/api/client";
 import { storage } from "@/src/utils/storage";
+import { registrarPush } from "@/src/notifications/push";
 
 export type Rol = "socio" | "contador";
 
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const res = await api.get("/auth/me");
           setUser(res.data.user);
           setPozo(res.data.pozo);
+          registrarPush(res.data.pozo ? [res.data.pozo.id] : [], res.data.user?.id);
         } catch {
           await storage.secureRemove(TOKEN_KEY);
         }
@@ -60,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await storage.secureSet(TOKEN_KEY, res.data.access_token);
     setUser(res.data.user);
     setPozo(res.data.pozo);
+    registrarPush(res.data.pozo ? [res.data.pozo.id] : [], res.data.user?.id);
     return res.data.user as AppUser;
   }, []);
 

@@ -10,6 +10,7 @@ import { api } from "@/src/api/client";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { AppModal } from "@/src/components/AppModal";
 import { Button } from "@/src/components/Button";
+import { seguirPozo, dejarPozo, estadoPozos } from "@/src/notifications/push";
 import { spacing, radius, fontSize } from "@/src/theme/colors";
 
 interface SocioPublico {
@@ -33,6 +34,27 @@ export default function PublicView() {
   const [refreshing, setRefreshing] = useState(false);
   const [callTarget, setCallTarget] = useState<SocioPublico | null>(null);
   const [copied, setCopied] = useState(false);
+  const [siguiendo, setSiguiendo] = useState(false);
+  const [avisoSeguir, setAvisoSeguir] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    (async () => {
+      const pozos = await estadoPozos();
+      setSiguiendo(pozos.includes(pozoId as string));
+    })();
+  }, [pozoId]);
+
+  const toggleSeguir = async () => {
+    if (siguiendo) {
+      await dejarPozo(pozoId as string);
+      setSiguiendo(false);
+    } else {
+      const ok = await seguirPozo(pozoId as string);
+      setSiguiendo(ok);
+      if (ok) setAvisoSeguir(true);
+    }
+  };
 
   const load = useCallback(async () => {
     try {
@@ -89,6 +111,11 @@ export default function PublicView() {
           <Text style={styles.headerTitle}>Pozo {pozoNombre}</Text>
           <Text style={styles.headerSub}>Socios y turno actual</Text>
         </View>
+        {Platform.OS !== "web" ? (
+          <Pressable onPress={toggleSeguir} hitSlop={10} testID="public-follow" style={{ marginRight: spacing.sm }}>
+            <Feather name={siguiendo ? "bell" : "bell-off"} size={20} color="#FFFFFF" />
+          </Pressable>
+        ) : null}
         <Pressable onPress={onRefresh} hitSlop={10} testID="public-refresh">
           <Feather name="refresh-cw" size={20} color="#FFFFFF" />
         </Pressable>
@@ -138,6 +165,13 @@ export default function PublicView() {
         <Text style={[styles.modalPhone, { color: colors.brand }]}>{callTarget?.telefono}</Text>
         <Button title={copied ? "Numero copiado" : "Copiar numero"} onPress={copyNumber} variant={copied ? "success" : "primary"} icon={<Feather name={copied ? "check" : "copy"} size={18} color="#FFFFFF" />} style={{ marginTop: spacing.lg }} />
       </AppModal>
+      <AppModal visible={avisoSeguir} onClose={() => setAvisoSeguir(false)} title="Avisos activados" testID="follow-modal">
+        <Text style={[styles.modalName, { color: colors.onSurface }]}>Pozo {pozoNombre}</Text>
+        <Text style={[styles.followText, { color: colors.muted }]}>
+          Ahora recibiras avisos de este pozo en tu telefono: emergencias, multas, recorridos, horas de sobra y dias festivos.
+        </Text>
+        <Button title="Entendido" onPress={() => setAvisoSeguir(false)} icon={<Feather name="check" size={18} color="#FFFFFF" />} style={{ marginTop: spacing.lg }} />
+      </AppModal>
     </View>
   );
 }
@@ -157,4 +191,5 @@ const styles = StyleSheet.create({
   callBtn: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
   modalName: { fontSize: fontSize.xl, fontWeight: "700", textAlign: "center" },
   modalPhone: { fontSize: fontSize.xxl, fontWeight: "800", textAlign: "center", marginTop: spacing.sm },
+  followText: { fontSize: fontSize.base, textAlign: "center", marginTop: spacing.sm, lineHeight: 20 },
 });

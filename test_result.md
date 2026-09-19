@@ -101,3 +101,13 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+## 2026-09-19 - Notificaciones push (Expo standalone)
+Implementado por main agent. Requiere pruebas de BACKEND.
+Cambios:
+- Nueva coleccion push_devices. crear_notificacion() ahora envia push via Expo (exp.host).
+- Endpoints: POST /api/push/register, POST /api/push/seguir, POST /api/push/dejar, GET /api/push/estado
+- Scheduler de festivos (asyncio) que crea notificacion segun regla: festivo lun/mar -> viernes previo; mie-dom -> lunes de esa semana.
+A probar:
+- Endpoints push (register/seguir/dejar/estado) + validacion de pozo inexistente (404).
+- Que los flujos que crean notificaciones sigan funcionando tras cambiar crear_notificacion: crear emergencia (socio), crear multa (contador), agua-sobra/agregar (socio), dias-sin-servicio (socio), y GET /api/notificaciones.
+Creds: contador@isidro.com/pozo2026, alfredo.velez@isidro.com/pozo2026

@@ -54,3 +54,12 @@ MXN, fechas DD/MM/YYYY. Codigo limpio sin trazas de Emergent/IA.
 
 ## Proximos pasos
 - Esperar feedback del usuario y priorizar backlog.
+
+## Actualizacion 2026-09-19: Notificaciones push (Expo standalone)
+- Backend: coleccion push_devices; crear_notificacion envia push via Expo (exp.host) a todos los que siguen el pozo (o al socio destinatario en multas personales).
+- Endpoints publicos: POST /api/push/register, /api/push/seguir, /api/push/dejar, GET /api/push/estado.
+- Scheduler asyncio de festivos: festivo lun/mar -> aviso viernes previo; mie-dom -> aviso lunes de esa semana. Dedupe via coleccion festivo_avisos.
+- Frontend: src/notifications/push.ts; auto-registro/seguir su pozo al iniciar sesion; campanita 🔔 seguir/dejar en vista publica (solo movil).
+- Eventos con push: emergencias, multas, dias-sin-servicio (recorrido), horas de sobra, festivos.
+- PENDIENTE del usuario para que llegue al telefono: proyecto Firebase + google-services.json (Android), APNs (iOS), y build via boton Publish. No funciona en Expo Go ni web.
+- Probado: 31/31 tests backend OK (iteration_2.json).

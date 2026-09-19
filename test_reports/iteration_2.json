@@ -1,0 +1,39 @@
+{
+  "summary": "Backend-only round for the new Expo push endpoints. Added 13 new pytest cases in /app/backend/tests/test_push_notifications.py covering POST /api/push/register, GET /api/push/estado, POST /api/push/seguir, POST /api/push/dejar (including 404 for unknown pozo and empty response for unknown installation_id), plus regression coverage for /api/emergencias, /api/multas, /api/agua-sobra/agregar, /api/dias-sin-servicio and /api/notificaciones after crear_notificacion was modified to also send push to Expo (exp.host). All 31 backend tests pass (18 pre-existing + 13 new) against EXPO_PUBLIC_BACKEND_URL. crear_notificacion is tolerant to invalid Expo tokens: even with an ExponentPushToken[TEST_*] token registered before creating an emergencia/multa, the resource is created successfully (Expo replies with an error but enviar_push swallows it in a try/except). Push endpoints do not require auth as expected. Login regression works for contador@isidro.com and alfredo.velez@isidro.com.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "crear_notificacion (server.py:450)", "issue": "enviar_push is wrapped in try/except internally but the call from crear_notificacion is not additionally guarded. Current httpx errors are caught inside enviar_push, so requests still succeed. Not a bug today, but if enviar_push ever raises before the try block (e.g. filter step), the resource creation would break. Consider wrapping the enviar_push call in crear_notificacion in its own try/except for defense in depth."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_api.py",
+    "/app/backend/tests/test_extra.py",
+    "/app/backend/tests/test_push_notifications.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "None required for this round. Optional hardening: additional try/except around enviar_push call inside crear_notificacion for defense in depth."
+  ],
+  "critical_code_review_comments": [
+    "POST /push/register uses expo_token as the unique key (upsert on expo_token) and updates installation_id, user_id and pozo_ids via $addToSet -- correct behavior; sending the same token twice is idempotent and grows the pozo_ids set.",
+    "GET /push/estado is a public endpoint that leaks the pozo_ids of any installation_id if guessed. Not a security concern today (public followers) but worth documenting.",
+    "enviar_push filters tokens via startswith('ExponentPushToken'), so ExponentPushToken[TEST1] passes through and reaches exp.host. Expo will respond with DeviceNotRegistered/InvalidCredentials but the response is not parsed. Consider logging ticket errors from Expo to spot dead tokens.",
+    "server.py is now 1131 lines -- close to the 700-line threshold. Consider extracting push and notifications into their own router module when features grow."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_push_notifications.py (new: 13 tests for push endpoints and crear_notificacion regressions)"
+  ],
+  "success_rate": {"backend": "100% (31/31)", "frontend": "not tested (skipped per request)"},
+  "seed_data_creation": "No seed data created. Tests use random installation_id/expo_token per run and clean up multas/dias-sin-servicio/horas-sobra they generate.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "New tests live at /app/backend/tests/test_push_notifications.py and share the same pattern as test_api.py/test_extra.py (BASE_URL from EXPO_PUBLIC_BACKEND_URL, login helper). Push endpoints /api/push/{register,seguir,dejar,estado} are public (no bearer). Use a unique installation_id per test run to avoid collisions. crear_notificacion calls enviar_push after inserting the notification doc; enviar_push has an outer try/except so httpx errors from exp.host cannot break resource creation.",
+  "rca_of_issue": "No bug in this round. Verified crear_notificacion tolerance by pre-registering an invalid ExponentPushToken[TEST_*] for pozo_id=isidro then creating an emergencia via alfredo.velez@isidro.com and a multa via contador@isidro.com -- both returned 200 and the resource was persisted."
+}

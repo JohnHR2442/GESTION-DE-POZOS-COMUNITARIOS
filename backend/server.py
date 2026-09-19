@@ -14,6 +14,8 @@ from jose import JWTError, jwt
 from dotenv import load_dotenv
 import bcrypt
 import secrets
+import asyncio
+import httpx
 import aiosmtplib
 from email.message import EmailMessage
 
@@ -207,6 +209,18 @@ class AguaSobraBody(BaseModel):
     horas: int = Field(ge=1, le=24)
 
 
+class PushRegister(BaseModel):
+    expo_token: str
+    installation_id: str
+    pozo_ids: List[str] = Field(default_factory=list)
+    user_id: Optional[str] = None
+
+
+class SeguirBody(BaseModel):
+    installation_id: str
+    pozo_id: str
+
+
 # ---------------------------------------------------------------------------
 # Auth dependencies
 # ---------------------------------------------------------------------------
@@ -386,6 +400,53 @@ async def seed_database():
 # ---------------------------------------------------------------------------
 # Notification helper
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Push notifications (servicio Expo propio, sin dependencias de plataforma)
+# ---------------------------------------------------------------------------
+EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
+
+
+async def enviar_push(tokens: List[str], titulo: str, mensaje: str, data: Optional[dict] = None):
+    tokens = [t for t in set(tokens) if t and t.startswith("ExponentPushToken")]
+    if not tokens:
+        return
+    messages = [
+        {
+            "to": t,
+            "sound": "default",
+            "title": titulo,
+            "body": mensaje,
+            "data": data or {},
+            "channelId": "default",
+            "priority": "high",
+        }
+        for t in tokens
+    ]
+    try:
+        async with httpx.AsyncClient(timeout=15) as hc:
+            for i in range(0, len(messages), 100):
+                await hc.post(
+                    EXPO_PUSH_URL,
+                    json=messages[i : i + 100],
+                    headers={"Accept": "application/json", "Content-Type": "application/json"},
+                )
+    except Exception as e:
+        logger.error(f"Error enviando push: {e}")
+
+
+async def tokens_destino(pozo_id: str, destinatario: str = "todos") -> List[str]:
+    """Tokens de los dispositivos que deben recibir la notificacion.
+    - "todos": cualquier dispositivo que siga este pozo (socios, contador y publico).
+    - socio_id: solo los dispositivos vinculados a ese usuario (multa personal, etc.).
+    """
+    if destinatario == "todos":
+        cursor = db.push_devices.find({"pozo_ids": pozo_id, "active": True})
+    else:
+        cursor = db.push_devices.find({"user_id": destinatario, "active": True})
+    docs = await cursor.to_list(length=2000)
+    return [d.get("expo_token") for d in docs]
+
+
 async def crear_notificacion(pozo_id: str, tipo: str, titulo: str, mensaje: str, destinatario: str = "todos"):
     doc = {
         "id": str(uuid.uuid4()),
@@ -398,6 +459,8 @@ async def crear_notificacion(pozo_id: str, tipo: str, titulo: str, mensaje: str,
         "leida_por": [],
     }
     await db.notificaciones.insert_one(doc)
+    tokens = await tokens_destino(pozo_id, destinatario)
+    await enviar_push(tokens, titulo, mensaje, {"tipo": tipo, "pozo_id": pozo_id})
     return doc
 
 
@@ -788,6 +851,58 @@ async def quitar_horas_sobra(body: AguaSobraBody, user=Depends(get_current_user)
 
 
 # ---------------------------------------------------------------------------
+# Routes: Push devices (registro publico de dispositivos)
+# ---------------------------------------------------------------------------
+@api.post("/push/register")
+async def push_register(body: PushRegister):
+    valid_ids: List[str] = []
+    if body.pozo_ids:
+        cursor = db.pozos.find({"id": {"$in": body.pozo_ids}})
+        valid_ids = [p["id"] for p in await cursor.to_list(length=10)]
+    now = now_utc().isoformat()
+    update: dict = {
+        "$set": {
+            "installation_id": body.installation_id,
+            "user_id": body.user_id,
+            "updated_at": now,
+            "active": True,
+        },
+        "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now},
+    }
+    if valid_ids:
+        update["$addToSet"] = {"pozo_ids": {"$each": valid_ids}}
+    await db.push_devices.update_one({"expo_token": body.expo_token}, update, upsert=True)
+    return {"ok": True}
+
+
+@api.post("/push/seguir")
+async def push_seguir(body: SeguirBody):
+    pozo = await db.pozos.find_one({"id": body.pozo_id})
+    if not pozo:
+        raise HTTPException(status_code=404, detail="Pozo no encontrado")
+    res = await db.push_devices.update_many(
+        {"installation_id": body.installation_id},
+        {"$addToSet": {"pozo_ids": body.pozo_id}},
+    )
+    return {"ok": True, "actualizados": res.modified_count}
+
+
+@api.post("/push/dejar")
+async def push_dejar(body: SeguirBody):
+    await db.push_devices.update_many(
+        {"installation_id": body.installation_id},
+        {"$pull": {"pozo_ids": body.pozo_id}},
+    )
+    return {"ok": True}
+
+
+@api.get("/push/estado")
+async def push_estado(installation_id: str):
+    doc = await db.push_devices.find_one({"installation_id": installation_id})
+    return {"pozo_ids": doc.get("pozo_ids", []) if doc else []}
+
+
+# ---------------------------------------------------------------------------
 # Routes: Notificaciones
 # ---------------------------------------------------------------------------
 def notif_visible_para(notif: dict, user: dict) -> bool:
@@ -927,6 +1042,59 @@ async def historial(year: int, month: int, user=Depends(get_current_user)):
 
 
 # ---------------------------------------------------------------------------
+# Scheduler: avisos automaticos de dias festivos
+# ---------------------------------------------------------------------------
+DIAS_ES = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+            "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
+
+def festivo_dia_aviso(holiday: date) -> date:
+    """Dia en que se debe enviar el aviso del festivo.
+    - Festivo en lunes o martes -> el viernes de la semana anterior.
+    - Festivo de miercoles a domingo -> el lunes de esa misma semana.
+    """
+    wd = holiday.weekday()  # lunes = 0
+    if wd in (0, 1):
+        return holiday - timedelta(days=wd + 3)
+    return holiday - timedelta(days=wd)
+
+
+async def revisar_festivos():
+    hoy = date.today()
+    pozos = await db.pozos.find({}).to_list(length=10)
+    for pozo in pozos:
+        festivos = list(festivos_for_year(pozo.get("festivos", []), hoy.year))
+        if hoy.month == 12:
+            festivos += festivos_for_year(pozo.get("festivos", []), hoy.year + 1)
+        for iso in festivos:
+            try:
+                h = date.fromisoformat(iso)
+            except ValueError:
+                continue
+            if h < hoy or festivo_dia_aviso(h) != hoy:
+                continue
+            key = f"{pozo['id']}:{iso}"
+            if await db.festivo_avisos.find_one({"key": key}):
+                continue
+            fecha_txt = f"{DIAS_ES[h.weekday()]} {h.day} de {MESES_ES[h.month - 1]}"
+            await crear_notificacion(
+                pozo["id"], "festivo", "Dia festivo",
+                f"Recordatorio: no se laborara el {fecha_txt} por ser dia festivo.",
+            )
+            await db.festivo_avisos.insert_one({"key": key, "fecha": now_utc().isoformat()})
+
+
+async def scheduler_festivos():
+    while True:
+        try:
+            await revisar_festivos()
+        except Exception as e:
+            logger.error(f"Error en scheduler de festivos: {e}")
+        await asyncio.sleep(3600)
+
+
+# ---------------------------------------------------------------------------
 # Health
 # ---------------------------------------------------------------------------
 @api.get("/")
@@ -950,7 +1118,11 @@ async def on_startup():
     await db.usuarios.create_index("email", unique=True)
     await db.usuarios.create_index("pozo_id")
     await db.multas.create_index("pozo_id")
+    await db.push_devices.create_index("expo_token", unique=True)
+    await db.push_devices.create_index("installation_id")
+    await db.push_devices.create_index("pozo_ids")
     await seed_database()
+    asyncio.create_task(scheduler_festivos())
 
 
 @app.on_event("shutdown")
