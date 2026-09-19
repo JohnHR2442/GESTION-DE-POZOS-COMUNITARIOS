@@ -63,3 +63,14 @@ MXN, fechas DD/MM/YYYY. Codigo limpio sin trazas de Emergent/IA.
 - Eventos con push: emergencias, multas, dias-sin-servicio (recorrido), horas de sobra, festivos.
 - PENDIENTE del usuario para que llegue al telefono: proyecto Firebase + google-services.json (Android), APNs (iOS), y build via boton Publish. No funciona en Expo Go ni web.
 - Probado: 31/31 tests backend OK (iteration_2.json).
+
+## Actualizacion 2026-09-19: Despliegue standalone (Opcion B)
+- Backend desplegado en Render (Web Service, free): https://gestion-de-pozos-comunitarios.onrender.com
+  - Root dir: backend | Build: pip install -r requirements.txt | Start: uvicorn server:app --host 0.0.0.0 --port $PORT
+  - Env: MONGO_URL (Atlas), DB_NAME=turnos_de_pozo, JWT_SECRET, GMAIL_ADDRESS, GMAIL_APP_PASSWORD
+- Base de datos: MongoDB Atlas (cluster0.xhmkz4c) usuario juanjosehrisc_db_user; Network Access 0.0.0.0/0. Seed automatico OK (3 pozos, 30 usuarios).
+- Codigo en GitHub: JohnHR2442/GESTION-DE-POZOS-COMUNITARIOS (rama main).
+- Frontend .env: agregado EXPO_PUBLIC_API_URL=https://gestion-de-pozos-comunitarios.onrender.com (la app/build apunta al servidor propio). No se tocaron EXPO_PACKAGER_*.
+- Verificado en vivo: /api/ health, /api/pozos, login contador@isidro.com, /api/pozos/isidro/socios y app cargando desde Render.
+- Nota: Render free "duerme" tras ~15 min; el scheduler de festivos puede no dispararse si esta dormido. Solucion opcional: keep-alive/cron ping o plan de pago.
+- Pendiente del usuario: generar build Android (Emergent Publish -> Publish to Play Store) e instalar en telefono para probar push.
