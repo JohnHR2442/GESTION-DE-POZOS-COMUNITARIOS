@@ -7,6 +7,7 @@ from typing import List, Optional, Annotated
 
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, EmailStr, BeforeValidator
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
@@ -1103,6 +1104,69 @@ async def root():
 
 
 app.include_router(api)
+
+PRIVACY_HTML = """<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politica de Privacidad - Turnos de Pozo</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:760px;margin:0 auto;padding:24px;color:#1f2937;line-height:1.6}
+h1{color:#0284C7}h2{color:#0369a1;margin-top:28px}
+.fecha{color:#6b7280;font-size:14px}
+footer{margin-top:40px;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb;padding-top:16px}
+</style>
+</head>
+<body>
+<h1>Politica de Privacidad</h1>
+<p class="fecha">Aplicacion: Turnos de Pozo (Gestion de Pozos Comunitarios). Ultima actualizacion: septiembre 2026.</p>
+
+<p>Esta aplicacion ("la App") gestiona los turnos de riego de tres pozos comunitarios y el envio de avisos a sus socios y usuarios. Respetamos tu privacidad y solo usamos la informacion necesaria para el funcionamiento del servicio.</p>
+
+<h2>1. Informacion que recopilamos</h2>
+<ul>
+<li><strong>Datos de cuenta (solo socios y contadores):</strong> nombre, correo electronico y numero de telefono, para identificar al usuario y mostrar el turno correspondiente.</li>
+<li><strong>Token de notificaciones:</strong> un identificador del dispositivo que permite enviar avisos push (emergencias, multas, recorridos, horas de sobra y dias festivos). Se asocia a los pozos que el usuario decide seguir.</li>
+<li><strong>Datos de uso de la App:</strong> multas, emergencias reportadas, dias sin servicio y horas de sobra que los propios usuarios registran.</li>
+</ul>
+
+<h2>2. Como usamos la informacion</h2>
+<ul>
+<li>Para mostrar los turnos, socios y avisos de cada pozo.</li>
+<li>Para enviar notificaciones a los dispositivos que eligieron seguir un pozo.</li>
+<li>Para permitir el inicio de sesion y la recuperacion de contrasena.</li>
+</ul>
+
+<h2>3. Notificaciones push</h2>
+<p>Las notificaciones se entregan a traves del servicio de mensajeria de Expo y de los sistemas de Google (Firebase Cloud Messaging) y Apple (APNs). El unico dato compartido con ellos es el token del dispositivo, indispensable para la entrega del aviso.</p>
+
+<h2>4. Con quien compartimos la informacion</h2>
+<p>No vendemos ni alquilamos tus datos. La informacion se guarda en nuestra base de datos privada (MongoDB Atlas) y solo se comparte con los proveedores tecnicos indispensables para el funcionamiento de las notificaciones.</p>
+
+<h2>5. Permisos del dispositivo</h2>
+<p>La App solicita permiso de <strong>Notificaciones</strong> unicamente para poder enviarte los avisos del pozo. Puedes desactivarlas en cualquier momento desde la configuracion de tu telefono o dejando de seguir el pozo dentro de la App.</p>
+
+<h2>6. Conservacion y eliminacion de datos</h2>
+<p>Los datos se conservan mientras la cuenta este activa. Si deseas eliminar tu informacion o tu cuenta, contactanos al correo indicado abajo.</p>
+
+<h2>7. Menores de edad</h2>
+<p>La App esta dirigida a los socios y usuarios de los pozos comunitarios y no esta pensada para menores de edad.</p>
+
+<h2>8. Cambios a esta politica</h2>
+<p>Podemos actualizar esta politica cuando sea necesario. La fecha de la ultima actualizacion aparece al inicio de esta pagina.</p>
+
+<h2>9. Contacto</h2>
+<p>Para dudas sobre privacidad o para solicitar la eliminacion de tus datos, escribe a: <strong>comissariadocarpinteros@gmail.com</strong></p>
+
+<footer>Turnos de Pozo - Gestion de Pozos Comunitarios. Uso comunitario.</footer>
+</body>
+</html>"""
+
+
+@app.get("/privacidad", response_class=HTMLResponse)
+async def privacidad():
+    return PRIVACY_HTML
 
 app.add_middleware(
     CORSMiddleware,
