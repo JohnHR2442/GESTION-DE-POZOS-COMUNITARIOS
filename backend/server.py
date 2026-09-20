@@ -7,7 +7,7 @@ from typing import List, Optional, Annotated
 
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel, Field, EmailStr, BeforeValidator
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
@@ -1167,6 +1167,11 @@ footer{margin-top:40px;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb
 @app.get("/privacidad", response_class=HTMLResponse)
 async def privacidad():
     return PRIVACY_HTML
+
+
+@app.get("/icono.png")
+async def icono():
+    return FileResponse(ROOT_DIR / "app_icon.png", media_type="image/png")
 
 app.add_middleware(
     CORSMiddleware,
