@@ -1,0 +1,30 @@
+{
+  "summary": "Frontend-only regression after splash asset changes (splash-icon.png added, splash-image.png rebranded, app.json expo-splash-screen plugin points to splash-icon.png). No bundling crash and all 4 requested flows pass on mobile viewport (375x667) against the preview URL: (1) Home '/' renders 'Turnos de Pozo' title + subtitle + the 3 pozos San Isidro / Zapata / Cardenas fetched from Render backend, (2) selecting 'San Isidro' + tapping 'Soy usuario (ver turnos)' navigates to /publico/isidro and shows 'Pozo San Isidro' / 'Socios y turno actual' with 9 socios (Marcelino Huerta en turno, Jose Isabel Huerta with Horas de sobra: 8), (3) /login?pozo=isidro renders correctly with 'Pozo San Isidro' tag and login with contador@isidro.com / pozo2026 succeeds and redirects to /contador/multas (contador dashboard shows 'No hay multas registradas'), (4) no red screen, no page errors, Metro bundled cleanly (Web Bundled 633ms). Only benign console warnings: '[expo-notifications] Listening to push token changes is not yet fully supported on web' and 'props.pointerEvents is deprecated. Use style.pointerEvents'. Splash native asset cannot be verified in web preview (documented limitation in the request).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "pointerEvents prop", "issue": "React Native web deprecation warning: 'props.pointerEvents is deprecated. Use style.pointerEvents'. Not a functional bug but should be migrated. Reference: appears when navigating to /login (likely inside a Pressable/View in login.tsx or a shared component). Recommend running: grep -R 'pointerEvents=' /app/frontend/app /app/frontend/src to locate and move to style.pointerEvents."}
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_3.json"
+  ],
+  "action_items": [
+    "Optional: migrate any component still using the JSX prop pointerEvents=... to style={{ pointerEvents: '...' }} to silence the RN Web deprecation warning."
+  ],
+  "critical_code_review_comments": [
+    "app.json now references ./assets/images/splash-icon.png in the expo-splash-screen plugin and the file exists on disk (236 KB). Consistent, no crash.",
+    "Package version drift reported by Expo at startup (expo@54.0.34 vs ~54.0.37, expo-constants, expo-font, expo-router). Not blocking web preview but should be aligned via 'npx expo install --fix' during the next dependency update.",
+    "app/index.tsx Landing correctly disables the two CTAs until a pozo is selected (disabled={!selected}) and uses testID='pozo-card-<id>' / 'btn-soy-usuario' / 'btn-iniciar-sesion' -- good testability."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (skipped per request)", "frontend": "100% (4/4 flows)"},
+  "seed_data_creation": "None. Used existing seed credentials from /app/memory/test_credentials.md (contador@isidro.com / pozo2026).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Web preview URL is https://multi-pozo-app.preview.emergentagent.com. Frontend calls the Render backend at EXPO_PUBLIC_API_URL=https://gestion-de-pozos-comunitarios.onrender.com (free tier, first request may take ~15s if idle). Landing testIDs: pozo-card-isidro / -zapata / -cardenas, btn-soy-usuario, btn-iniciar-sesion. Public view testIDs: public-back, public-follow, public-refresh, socio-row-<orden>, call-<orden>, call-modal, follow-modal. Login testIDs: input-email, input-password, btn-login, login-error, toggle-password, login-back, btn-forgot. Contador default redirect is /contador/multas.",
+  "rca_of_issue": "N/A - regression check, all flows green. Splash native asset (splash-icon.png) cannot be exercised in web preview; expo-splash-screen plugin only affects native builds. Web bundling succeeds after the app.json change, confirming no config regression."
+}
