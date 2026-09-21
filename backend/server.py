@@ -100,6 +100,16 @@ def now_utc() -> datetime:
     return datetime.now(timezone.utc)
 
 
+# Zona horaria de la comunidad (Mexico, UTC-6 sin horario de verano).
+# El turno y el calendario se calculan con la fecha LOCAL, no en UTC,
+# para que no se adelante un dia por la noche.
+LOCAL_TZ = timezone(timedelta(hours=-6))
+
+
+def today_local() -> date:
+    return datetime.now(LOCAL_TZ).date()
+
+
 def create_token(user_id: str, rol: str, pozo_id: str) -> str:
     payload = {
         "sub": user_id,
@@ -586,7 +596,7 @@ async def public_socios(pozo_id: str):
     if not socios:
         raise HTTPException(status_code=404, detail="Pozo no encontrado")
     pozo = await db.pozos.find_one({"id": pozo_id})
-    turno_idx = socio_en_turno_index(date.today(), pozo_inicio(pozo))
+    turno_idx = socio_en_turno_index(today_local(), pozo_inicio(pozo))
     result = []
     for s in socios:
         en_turno = (s.get("orden") == turno_idx + 1) if turno_idx >= 0 else False
@@ -607,13 +617,13 @@ async def turno_hoy(pozo_id: str):
     if not socios:
         raise HTTPException(status_code=404, detail="Pozo no encontrado")
     pozo = await db.pozos.find_one({"id": pozo_id})
-    idx = socio_en_turno_index(date.today(), pozo_inicio(pozo))
+    idx = socio_en_turno_index(today_local(), pozo_inicio(pozo))
     if idx < 0:
-        return {"socio": None, "fecha": date.today().isoformat()}
+        return {"socio": None, "fecha": today_local().isoformat()}
     socio = next((s for s in socios if s.get("orden") == idx + 1), None)
     return {
         "socio": {"id": socio["id"], "nombre": socio["nombre"]} if socio else None,
-        "fecha": date.today().isoformat(),
+        "fecha": today_local().isoformat(),
     }
 
 
@@ -753,7 +763,7 @@ async def crear_multa(req: MultaCreate, user=Depends(require_contador)):
     socio = await db.usuarios.find_one({"id": req.socio_id, "pozo_id": user["pozo_id"], "rol": "socio"})
     if not socio:
         raise HTTPException(status_code=404, detail="Socio no encontrado en este pozo")
-    fecha_creacion = req.fecha_creacion or date.today().isoformat()
+    fecha_creacion = req.fecha_creacion or today_local().isoformat()
     doc = {
         "id": str(uuid.uuid4()),
         "pozo_id": user["pozo_id"],
@@ -804,7 +814,7 @@ async def pagar_multa(multa_id: str, user=Depends(require_contador)):
         raise HTTPException(status_code=404, detail="Multa no encontrada")
     await db.multas.update_one(
         {"id": multa_id},
-        {"$set": {"estado": "pagado", "fecha_pago": date.today().isoformat()}},
+        {"$set": {"estado": "pagado", "fecha_pago": today_local().isoformat()}},
     )
     updated = await db.multas.find_one({"id": multa_id})
     return clean(updated)
@@ -1062,7 +1072,7 @@ def festivo_dia_aviso(holiday: date) -> date:
 
 
 async def revisar_festivos():
-    hoy = date.today()
+    hoy = today_local()
     pozos = await db.pozos.find({}).to_list(length=10)
     for pozo in pozos:
         festivos = list(festivos_for_year(pozo.get("festivos", []), hoy.year))

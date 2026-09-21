@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { spacing, radius, fontSize } from "@/src/theme/colors";
+import { localTodayIso } from "@/src/utils/date";
 
 export interface DiaCalendario {
   fecha: string;
@@ -34,7 +35,7 @@ export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) 
 
   const first = new Date(dias[0].fecha + "T00:00:00");
   const offset = mondayIndex(first.getDay());
-  const todayIso = new Date().toISOString().split("T")[0];
+  const todayIso = localTodayIso();
 
   const cells: (DiaCalendario | null)[] = [];
   for (let i = 0; i < offset; i++) cells.push(null);

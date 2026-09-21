@@ -14,6 +14,7 @@ import { AppModal } from "@/src/components/AppModal";
 import { Button } from "@/src/components/Button";
 import { NotificacionesModal } from "@/src/components/NotificacionesModal";
 import { formatFecha, nombreMes, capitalize } from "@/src/utils/format";
+import { localTodayIso } from "@/src/utils/date";
 import { spacing, radius, fontSize } from "@/src/theme/colors";
 
 const EMERGENCIAS = [
@@ -66,7 +67,7 @@ export default function SocioInicio() {
     setTimeout(() => setBanner(null), 3500);
   };
 
-  const todayIso = new Date().toISOString().split("T")[0];
+  const todayIso = localTodayIso();
   const turnoHoy = dias.find((d) => d.fecha === todayIso);
 
   const reportarEmergencia = async (tipo: string, label: string) => {

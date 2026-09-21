@@ -111,3 +111,12 @@ A probar:
 - Endpoints push (register/seguir/dejar/estado) + validacion de pozo inexistente (404).
 - Que los flujos que crean notificaciones sigan funcionando tras cambiar crear_notificacion: crear emergencia (socio), crear multa (contador), agua-sobra/agregar (socio), dias-sin-servicio (socio), y GET /api/notificaciones.
 Creds: contador@isidro.com/pozo2026, alfredo.velez@isidro.com/pozo2026
+
+## 2026-09-21 - Fix zona horaria (turno/calendario adelantados 1 dia)
+Bug: el turno y el calendario usaban UTC. En la noche de Mexico (UTC-6) UTC ya es el dia siguiente, adelantando el turno (mostraba Marcelino/lunes en vez de Jose Isabel/domingo).
+Fix backend (server.py): nuevo today_local() con LOCAL_TZ=UTC-6; se reemplazo date.today() -> today_local() (turno, calendario, festivos, multas).
+Fix frontend: src/utils/date.ts localTodayIso() (fecha local del dispositivo); usado en Calendar.tsx y app/socio/inicio.tsx en vez de new Date().toISOString().
+A probar (BACKEND en localhost:8001, hay discrepancia UTC vs local ahora mismo: UTC=2026-09-21, Mexico=2026-09-20):
+- GET /api/pozos/isidro/turno-hoy -> fecha debe ser la fecha LOCAL de Mexico (UTC-6), NO la de UTC. Con la discrepancia actual debe devolver 2026-09-20 y socio 'Jose Isabel Huerta'.
+- GET /api/pozos/isidro/socios -> el socio en 'en_turno' debe ser el de la fecha local (Jose Isabel, orden 4), no Marcelino (orden 5).
+- Confirmar que la fecha devuelta coincide con datetime.now(UTC-6).date().
