@@ -1,3 +1,6 @@
+# Artefactos de la plataforma (no subir a tu repo propio)
+.emergent/
+
 # Dependencias
 node_modules/
 .expo/
@@ -49,3 +52,6 @@ credentials.json
 *.pem
 *.key
 .credentials
+google-services.json
+*.keystore
+*.jks
