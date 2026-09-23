@@ -194,6 +194,7 @@ class MultaUpdate(BaseModel):
 
 class DiaSinServicioCreate(BaseModel):
     fecha: str  # YYYY-MM-DD
+    tipo: str = "turno_caido"  # "turno_caido" (verde) o "emergencia" (rojo)
     motivo: Optional[str] = None
 
 
@@ -682,7 +683,7 @@ async def calendario(year: int, month: int, user=Depends(get_current_user)):
     # dias sin servicio (manual)
     dss_cursor = db.dias_sin_servicio.find({"pozo_id": pozo_id})
     dss_docs = await dss_cursor.to_list(length=500)
-    dias_sin = {d["fecha"]: d.get("motivo") for d in dss_docs}
+    dias_sin = {d["fecha"]: d for d in dss_docs}
     festivos_mmdd = frozenset(pozo.get("festivos", []))
     sin_servicio_iso = frozenset(dias_sin.keys())
 
@@ -694,15 +695,16 @@ async def calendario(year: int, month: int, user=Depends(get_current_user)):
         socio = next((s for s in socios if s.get("orden") == idx + 1), None) if idx >= 0 else None
         iso = d.isoformat()
         es_festivo = iso in festivos
-        es_sin_servicio = iso in dias_sin
+        dss_doc = dias_sin.get(iso)
         dias.append({
             "fecha": iso,
             "dia": d.day,
             "socio_id": socio["id"] if socio else None,
             "socio_nombre": socio["nombre"] if socio else None,
             "festivo": es_festivo,
-            "sin_servicio": es_sin_servicio,
-            "motivo": dias_sin.get(iso),
+            "sin_servicio": dss_doc is not None,
+            "tipo": dss_doc.get("tipo") if dss_doc else None,
+            "motivo": dss_doc.get("motivo") if dss_doc else None,
         })
         d = d + timedelta(days=1)
     return {"year": year, "month": month, "dias": dias, "accent": pozo.get("accent")}
@@ -720,27 +722,35 @@ async def list_dias_sin_servicio(user=Depends(get_current_user)):
 
 @api.post("/dias-sin-servicio")
 async def crear_dia_sin_servicio(req: DiaSinServicioCreate, user=Depends(get_current_user)):
+    if user.get("rol") != "contador":
+        raise HTTPException(status_code=403, detail="Solo el contador puede registrar recorridos")
+    if req.tipo not in ("turno_caido", "emergencia"):
+        raise HTTPException(status_code=400, detail="Tipo de recorrido invalido")
     existing = await db.dias_sin_servicio.find_one({"pozo_id": user["pozo_id"], "fecha": req.fecha})
     if existing:
         raise HTTPException(status_code=400, detail="Ese dia ya esta marcado sin servicio")
+    tipo_label = "Turno caido" if req.tipo == "turno_caido" else "Emergencia"
     doc = {
         "id": str(uuid.uuid4()),
         "pozo_id": user["pozo_id"],
         "fecha": req.fecha,
-        "motivo": req.motivo or "Dia sin servicio",
+        "tipo": req.tipo,
+        "motivo": req.motivo or tipo_label,
         "creado_por": user["nombre"],
         "creado_en": now_utc().isoformat(),
     }
     await db.dias_sin_servicio.insert_one(doc)
     await crear_notificacion(
-        user["pozo_id"], "sin_servicio", "Dia sin servicio",
-        f"{user['nombre']} marco el {req.fecha} como dia sin servicio.",
+        user["pozo_id"], "sin_servicio", "Recorrido registrado",
+        f"El {req.fecha} se marco como dia sin servicio ({tipo_label}).",
     )
     return clean(doc)
 
 
 @api.delete("/dias-sin-servicio/{dss_id}")
 async def borrar_dia_sin_servicio(dss_id: str, user=Depends(get_current_user)):
+    if user.get("rol") != "contador":
+        raise HTTPException(status_code=403, detail="Solo el contador puede quitar recorridos")
     res = await db.dias_sin_servicio.delete_one({"id": dss_id, "pozo_id": user["pozo_id"]})
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="No encontrado")

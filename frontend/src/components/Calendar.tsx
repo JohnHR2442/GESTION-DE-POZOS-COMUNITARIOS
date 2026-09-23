@@ -12,6 +12,7 @@ export interface DiaCalendario {
   socio_nombre?: string | null;
   festivo?: boolean;
   sin_servicio?: boolean;
+  tipo?: string | null;
   motivo?: string | null;
 }
 
@@ -60,8 +61,11 @@ export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) 
           if (!d) return <View key={`e${i}`} style={styles.cell} />;
           const isMine = highlightSocioId && d.socio_id === highlightSocioId;
           const isToday = d.fecha === todayIso;
-          const outOfService = d.sin_servicio || d.festivo;
-          const bg = outOfService ? colors.errorSoft : colors.surfaceSecondary;
+          // Verde = turno caido; Rojo = emergencia o festivo
+          const esVerde = d.sin_servicio && d.tipo === "turno_caido";
+          const esRojo = d.festivo || (d.sin_servicio && d.tipo !== "turno_caido");
+          const bg = esVerde ? colors.success + "22" : esRojo ? colors.errorSoft : colors.surfaceSecondary;
+          const dotColor = esVerde ? colors.success : colors.error;
           const fg = colors.onSurface;
           return (
             <Pressable
@@ -79,8 +83,8 @@ export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) 
               ]}
             >
               <Text style={[styles.dayNum, { color: fg }]}>{d.dia}</Text>
-              {outOfService ? (
-                <View style={[styles.dot, { backgroundColor: colors.error }]} />
+              {esVerde || esRojo ? (
+                <View style={[styles.dot, { backgroundColor: dotColor }]} />
               ) : isMine ? (
                 <View style={[styles.dot, { backgroundColor: accent }]} />
               ) : null}

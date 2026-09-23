@@ -35,24 +35,16 @@ export default function SocioInicio() {
   const [year] = useState(now.getFullYear());
   const [month] = useState(now.getMonth() + 1);
   const [dias, setDias] = useState<DiaCalendario[]>([]);
-  const [dssMap, setDssMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [showEmergencia, setShowEmergencia] = useState(false);
-  const [showRecorrido, setShowRecorrido] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [cal, dss] = await Promise.all([
-        api.get("/turnos/calendario", { params: { year, month } }),
-        api.get("/dias-sin-servicio"),
-      ]);
+      const cal = await api.get("/turnos/calendario", { params: { year, month } });
       setDias(cal.data.dias);
-      const map: Record<string, string> = {};
-      dss.data.forEach((d: any) => { map[d.fecha] = d.id; });
-      setDssMap(map);
     } catch {
       // silencioso
     } finally {
@@ -84,28 +76,8 @@ export default function SocioInicio() {
     }
   };
 
-  const toggleSinServicio = async (dia: DiaCalendario) => {
-    setWorking(true);
-    try {
-      if (dssMap[dia.fecha]) {
-        await api.delete(`/dias-sin-servicio/${dssMap[dia.fecha]}`);
-        flash(`Servicio restablecido el ${formatFecha(dia.fecha)}`);
-      } else {
-        await api.post("/dias-sin-servicio", { fecha: dia.fecha });
-        flash(`Dia sin servicio: ${formatFecha(dia.fecha)}`);
-      }
-      await load();
-      reloadNotif();
-    } catch (e) {
-      flash(apiErrorMessage(e));
-    } finally {
-      setWorking(false);
-    }
-  };
-
   const actions = [
     { key: "emergencia", label: "Emergencia", icon: "alert-triangle", color: colors.error, onPress: () => setShowEmergencia(true) },
-    { key: "recorrido", label: "Recorrido", icon: "map", color: accent, onPress: () => setShowRecorrido(true) },
     { key: "notificaciones", label: "Notificaciones", icon: "bell", color: colors.warning, onPress: () => setShowNotif(true) },
     { key: "multas", label: "Multas", icon: "file-text", color: colors.brand, onPress: () => router.push("/socio/multas") },
     { key: "agua-sobra", label: "Agua de sobra", icon: "droplet", color: colors.success, onPress: () => router.push("/socio/agua-sobra") },
@@ -151,7 +123,8 @@ export default function SocioInicio() {
             <Calendar dias={dias} accent={accent} highlightSocioId={user?.id} />
             <View style={styles.legend}>
               <Legend color={accent} label="Tu turno" />
-              <Legend color={colors.error} label="Sin servicio" />
+              <Legend color={colors.success} label="Turno caido" />
+              <Legend color={colors.error} label="Emergencia / festivo" />
             </View>
           </View>
         )}
@@ -172,11 +145,6 @@ export default function SocioInicio() {
             <Feather name="chevron-right" size={20} color={colors.muted} />
           </Pressable>
         ))}
-      </AppModal>
-
-      <AppModal visible={showRecorrido} onClose={() => setShowRecorrido(false)} title="Recorrido del pozo" testID="recorrido-modal">
-        <Text style={[styles.modalHint, { color: colors.muted }]}>Toca un dia para marcarlo o quitarlo como dia sin servicio.</Text>
-        <Calendar dias={dias} accent={accent} highlightSocioId={user?.id} onDayPress={toggleSinServicio} />
       </AppModal>
 
       <NotificacionesModal visible={showNotif} onClose={() => setShowNotif(false)} />

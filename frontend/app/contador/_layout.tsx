@@ -31,6 +31,7 @@ export default function ContadorLayout() {
       }}
     >
       <Tabs.Screen name="multas" options={{ title: "Multas", tabBarIcon: ({ color, size }) => <Feather name="file-text" size={size} color={color} /> }} />
+      <Tabs.Screen name="recorrido" options={{ title: "Recorrido", tabBarIcon: ({ color, size }) => <Feather name="map" size={size} color={color} /> }} />
       <Tabs.Screen name="perfil" options={{ title: "Perfil", tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} /> }} />
     </Tabs>
   );
