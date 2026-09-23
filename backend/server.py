@@ -286,11 +286,50 @@ def pozo_inicio(pozo: dict) -> date:
     return date.fromisoformat(pozo.get("inicio", SEASON_START.isoformat()))
 
 
-def socio_en_turno_index(target: date, start: date = SEASON_START) -> int:
+def current_turno_date() -> date:
+    """Fecha del turno vigente AHORA. El cambio de turno es a las 18:00 hora local:
+    antes de las 18:00 sigue vigente el turno que inicio el dia anterior."""
+    now = datetime.now(LOCAL_TZ)
+    d = now.date()
+    if now.hour < 18:
+        d = d - timedelta(days=1)
+    return d
+
+
+def es_dia_laborable(d: date, festivos_mmdd: frozenset, sin_servicio_iso: frozenset) -> bool:
+    if d.strftime("%m-%d") in festivos_mmdd:
+        return False
+    if d.isoformat() in sin_servicio_iso:
+        return False
+    return True
+
+
+async def nonworking_sets(pozo: dict):
+    """Devuelve (festivos MM-DD, dias sin servicio ISO) de un pozo."""
+    festivos_mmdd = frozenset(pozo.get("festivos", []))
+    dss = await db.dias_sin_servicio.find({"pozo_id": pozo["id"]}).to_list(length=1000)
+    sin_servicio_iso = frozenset(d["fecha"] for d in dss)
+    return festivos_mmdd, sin_servicio_iso
+
+
+def socio_en_turno_index(target: date, start: date = SEASON_START,
+                         festivos_mmdd: frozenset = frozenset(),
+                         sin_servicio_iso: frozenset = frozenset()) -> int:
+    """Indice (0-8) del socio en turno para la fecha dada.
+    Los dias festivos y los dias sin servicio NO cuentan como turno: se saltan
+    y la rotacion se recorre al siguiente dia laborable. En un dia no laborable
+    no hay turno (devuelve -1)."""
     if target < start:
         return -1
-    delta = (target - start).days
-    return delta % 9
+    if not es_dia_laborable(target, festivos_mmdd, sin_servicio_iso):
+        return -1
+    count = 0
+    d = start
+    while d <= target:
+        if es_dia_laborable(d, festivos_mmdd, sin_servicio_iso):
+            count += 1
+        d += timedelta(days=1)
+    return (count - 1) % 9
 
 
 # ---------------------------------------------------------------------------
@@ -302,7 +341,7 @@ POZOS_SEED = [
         "nombre": "San Isidro",
         "dominio": "isidro.com",
         "accent": "#0EA5E9",
-        "inicio": "2026-01-08",
+        "inicio": "2026-01-05",
         "festivos": ["01-01", "02-12", "03-19", "09-15", "11-01", "11-02", "12-12", "12-25"],
         "socios": [
             ("Alfredo Velez", "2231159370", "alfredo.velez@isidro.com"),
@@ -596,7 +635,8 @@ async def public_socios(pozo_id: str):
     if not socios:
         raise HTTPException(status_code=404, detail="Pozo no encontrado")
     pozo = await db.pozos.find_one({"id": pozo_id})
-    turno_idx = socio_en_turno_index(today_local(), pozo_inicio(pozo))
+    festivos_mmdd, sin_servicio_iso = await nonworking_sets(pozo)
+    turno_idx = socio_en_turno_index(current_turno_date(), pozo_inicio(pozo), festivos_mmdd, sin_servicio_iso)
     result = []
     for s in socios:
         en_turno = (s.get("orden") == turno_idx + 1) if turno_idx >= 0 else False
@@ -617,13 +657,15 @@ async def turno_hoy(pozo_id: str):
     if not socios:
         raise HTTPException(status_code=404, detail="Pozo no encontrado")
     pozo = await db.pozos.find_one({"id": pozo_id})
-    idx = socio_en_turno_index(today_local(), pozo_inicio(pozo))
+    festivos_mmdd, sin_servicio_iso = await nonworking_sets(pozo)
+    turno_date = current_turno_date()
+    idx = socio_en_turno_index(turno_date, pozo_inicio(pozo), festivos_mmdd, sin_servicio_iso)
     if idx < 0:
-        return {"socio": None, "fecha": today_local().isoformat()}
+        return {"socio": None, "fecha": turno_date.isoformat()}
     socio = next((s for s in socios if s.get("orden") == idx + 1), None)
     return {
         "socio": {"id": socio["id"], "nombre": socio["nombre"]} if socio else None,
-        "fecha": today_local().isoformat(),
+        "fecha": turno_date.isoformat(),
     }
 
 
@@ -641,12 +683,14 @@ async def calendario(year: int, month: int, user=Depends(get_current_user)):
     dss_cursor = db.dias_sin_servicio.find({"pozo_id": pozo_id})
     dss_docs = await dss_cursor.to_list(length=500)
     dias_sin = {d["fecha"]: d.get("motivo") for d in dss_docs}
+    festivos_mmdd = frozenset(pozo.get("festivos", []))
+    sin_servicio_iso = frozenset(dias_sin.keys())
 
     # build days in month
     d = date(year, month, 1)
     dias = []
     while d.month == month:
-        idx = socio_en_turno_index(d, inicio)
+        idx = socio_en_turno_index(d, inicio, festivos_mmdd, sin_servicio_iso)
         socio = next((s for s in socios if s.get("orden") == idx + 1), None) if idx >= 0 else None
         iso = d.isoformat()
         es_festivo = iso in festivos
@@ -993,10 +1037,11 @@ async def estadisticas(user=Depends(get_current_user)):
     if user.get("orden"):
         pozo = await db.pozos.find_one({"id": pozo_id})
         inicio = pozo_inicio(pozo)
+        festivos_mmdd, sin_servicio_iso = await nonworking_sets(pozo)
         d = inicio
         end = date(inicio.year, 12, 31)
         while d <= end:
-            if socio_en_turno_index(d, inicio) == user["orden"] - 1:
+            if socio_en_turno_index(d, inicio, festivos_mmdd, sin_servicio_iso) == user["orden"] - 1:
                 mis_turnos += 1
             d += timedelta(days=1)
 
@@ -1035,12 +1080,14 @@ async def historial(year: int, month: int, user=Depends(get_current_user)):
     inicio = pozo_inicio(pozo)
     dss_docs = await db.dias_sin_servicio.find({"pozo_id": user["pozo_id"]}).to_list(length=500)
     dias_sin = {d["fecha"]: d.get("motivo") for d in dss_docs}
+    festivos_mmdd = frozenset(pozo.get("festivos", []))
+    sin_servicio_iso = frozenset(dias_sin.keys())
     orden = user.get("orden")
     dias = []
     if orden:
         d = date(year, month, 1)
         while d.month == month:
-            if socio_en_turno_index(d, inicio) == orden - 1:
+            if socio_en_turno_index(d, inicio, festivos_mmdd, sin_servicio_iso) == orden - 1:
                 iso = d.isoformat()
                 dias.append({
                     "fecha": iso,

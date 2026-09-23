@@ -120,3 +120,12 @@ A probar (BACKEND en localhost:8001, hay discrepancia UTC vs local ahora mismo: 
 - GET /api/pozos/isidro/turno-hoy -> fecha debe ser la fecha LOCAL de Mexico (UTC-6), NO la de UTC. Con la discrepancia actual debe devolver 2026-09-20 y socio 'Jose Isabel Huerta'.
 - GET /api/pozos/isidro/socios -> el socio en 'en_turno' debe ser el de la fecha local (Jose Isabel, orden 4), no Marcelino (orden 5).
 - Confirmar que la fecha devuelta coincide con datetime.now(UTC-6).date().
+
+## 2026-09-21 - Turnos: cambio a las 18:00, recorrido por festivos/dias sin servicio, recalibracion isidro
+- Cambio de turno a las 18:00 hora local (UTC-6): current_turno_date() -> antes de las 18:00 vige el turno del dia anterior. Usado en /pozos/{id}/socios (en_turno) y /pozos/{id}/turno-hoy.
+- socio_en_turno_index ahora SALTA dias no laborables (festivos MM-DD del pozo + dias_sin_servicio ISO) y recorre la rotacion; en dia no laborable devuelve -1 (SIN TURNO). Aplicado en socios, turno-hoy, calendario, estadisticas, historial.
+- isidro "inicio" recalibrado a 2026-01-05 para que domingo 20-sep-2026 = Jose Isabel Huerta (orden 4). Actualizado en seed y en DB (Atlas + local).
+Verificar (BACKEND localhost:8001, data ya limpia):
+- GET /turnos/calendario?year=2026&month=9 (login jose.huerta@isidro.com/pozo2026): dia 15 festivo con socio_nombre null (SIN TURNO); dia 20 -> 'Jose Isabel Huerta'; secuencia 16 Freddy Rojas,17 Alfredo Velez,18 Simon Meneses,19 Francisco Meneses,21 Marcelino Huerta (la rotacion se recorre por el festivo 15).
+- GET /pozos/isidro/socios y /pozos/isidro/turno-hoy consistentes entre si y con la 'fecha' devuelta (18:00 cutoff: si hora local <18:00, fecha=dia anterior).
+- Regresion: /api/auth/login y /api/pozos responden 200.
