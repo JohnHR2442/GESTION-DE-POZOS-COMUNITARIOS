@@ -1170,6 +1170,15 @@ async def root():
     return {"message": "Turnos de Pozo API", "status": "ok"}
 
 
+@api.get("/reporte-residencia")
+async def reporte_residencia():
+    return FileResponse(
+        "/app/Reporte_Residencia_Pozos.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Reporte_Residencia_Pozos.docx",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
