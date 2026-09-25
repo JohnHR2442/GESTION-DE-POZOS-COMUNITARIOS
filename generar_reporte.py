@@ -113,7 +113,7 @@ for _ in range(3):
     doc.add_paragraph()
 centrado("TESIS", size=16, bold=True)
 doc.add_paragraph()
-centrado("“GESTIÓN DE POZOS COMUNITARIOS: APLICACIÓN MÓVIL Y WEB PARA LA "
+centrado("“GESTIÓN DE POZOS COMUNITARIOS: APLICACIÓN MÓVIL ANDROID PARA LA "
          "ADMINISTRACIÓN DE TURNOS DE AGUA”", size=13, bold=True)
 for _ in range(2):
     doc.add_paragraph()
@@ -153,9 +153,9 @@ parr("[ Espacio reservado para que el alumno agregue su dedicatoria personal a "
 # =========================================================
 doc.add_page_break()
 h1("Resumen")
-parr("El presente trabajo describe el diseño y desarrollo de una aplicación híbrida, "
-     "móvil y web, para la administración de los turnos de agua de tres pozos "
-     "comunitarios: San Isidro, Zapata y Cárdenas. El sistema resuelve la confusión y "
+parr("El presente trabajo describe el diseño y desarrollo de una aplicación móvil "
+     "para dispositivos Android, orientada a la administración de los turnos de agua "
+     "de tres pozos comunitarios: San Isidro, Zapata y Cárdenas. El sistema resuelve la confusión y "
      "los conflictos que ocasionaba el control manual de los turnos, las multas y los "
      "avisos dentro de cada comunidad. La solución fue construida con React Native y "
      "Expo para el cliente, FastAPI para el servidor y MongoDB como base de datos, "
@@ -189,8 +189,8 @@ parr("El agua es un recurso indispensable para las comunidades rurales, y su "
      "aprovechar el recurso de manera ordenada. Sin embargo, cuando este control se "
      "realiza de forma manual, mediante libretas o de palabra, surgen confusiones, "
      "olvidos y conflictos entre los socios.")
-parr("El presente documento describe el desarrollo de una aplicación híbrida, "
-     "disponible para dispositivos móviles Android y para navegadores web, orientada a "
+parr("El presente documento describe el desarrollo de una aplicación móvil para "
+     "dispositivos Android, orientada a "
      "la administración de los turnos de agua de tres pozos comunitarios. El trabajo "
      "expone la problemática detectada, los objetivos planteados, el marco teórico que "
      "sustenta las tecnologías utilizadas, la metodología de desarrollo seguida y los "
@@ -253,7 +253,7 @@ parr("En síntesis, la ausencia de una herramienta que centralizara y automatiza
 
 h1("1.4 Objetivos")
 h3("1.4.1 Objetivo General")
-parr("Desarrollar una aplicación híbrida, para dispositivos móviles y web, que "
+parr("Desarrollar una aplicación móvil para dispositivos Android que "
      "administre de forma automática los turnos de agua de tres pozos comunitarios, "
      "empleando las tecnologías React Native, Expo, FastAPI y MongoDB, con el fin de "
      "aportar orden y transparencia a la distribución del recurso.")
@@ -298,20 +298,21 @@ parr("En este apartado se presentan los conceptos y tecnologías que sustentan e
      "desarrollo de la aplicación. El conjunto de fundamentos teóricos permite "
      "comprender las decisiones técnicas adoptadas durante el proyecto.")
 
-h3("Aplicaciones híbridas")
-parr("Una aplicación híbrida es aquella que, a partir de una sola base de código, "
-     "puede ejecutarse en distintas plataformas, como teléfonos móviles y navegadores "
-     "web. Este enfoque reduce el tiempo y el costo de desarrollo, ya que evita "
-     "programar por separado cada versión de la aplicación.")
+h3("Desarrollo de aplicaciones móviles")
+parr("Una aplicación móvil es un programa diseñado para ejecutarse en dispositivos "
+     "como teléfonos y tabletas. En el presente proyecto se desarrolló una aplicación "
+     "nativa para el sistema operativo Android, aprovechando marcos de trabajo modernos "
+     "que permiten construir interfaces fluidas y con buen rendimiento a partir de una "
+     "sola base de código.")
 
 h3("React Native y Expo")
 parr("React Native es un marco de trabajo de código abierto que permite construir "
-     "aplicaciones móviles utilizando el lenguaje JavaScript y la biblioteca React. "
-     "Su principal ventaja es que genera componentes nativos, lo que ofrece un "
-     "rendimiento cercano al de las aplicaciones desarrolladas de forma nativa. Expo "
-     "es un conjunto de herramientas y servicios construido sobre React Native que "
-     "simplifica el desarrollo, las pruebas y la generación de las versiones "
-     "instalables de la aplicación.")
+     "aplicaciones móviles para Android utilizando el lenguaje JavaScript y la "
+     "biblioteca React. Su principal ventaja es que genera componentes nativos, lo que "
+     "ofrece un rendimiento cercano al de las aplicaciones desarrolladas de forma "
+     "nativa. Expo es un conjunto de herramientas y servicios construido sobre React "
+     "Native que simplifica el desarrollo, las pruebas y la generación del archivo "
+     "instalable (APK/AAB) de la aplicación para Android.")
 
 h3("FastAPI")
 parr("FastAPI es un marco de trabajo moderno del lenguaje Python, orientado a la "
@@ -419,7 +420,7 @@ parr("El servidor se desplegó en un servicio en la nube y la base de datos se a
 cap_titulo("Capítulo IV. Resultados")
 
 h1("4.1 Resultados")
-parr("Como resultado del proyecto se obtuvo una aplicación híbrida completamente "
+parr("Como resultado del proyecto se obtuvo una aplicación móvil para Android completamente "
      "funcional, capaz de administrar los turnos de agua de los tres pozos "
      "comunitarios de manera automática y transparente. A continuación se describen "
      "los principales resultados obtenidos, tanto de forma cualitativa como "
@@ -468,6 +469,27 @@ parr("La información de los usuarios se protege mediante contraseñas cifradas 
      "se realiza sobre canales cifrados, garantizando la confidencialidad de los "
      "datos.")
 
+h3("Resultados cuantitativos")
+parr("Desde el punto de vista cuantitativo, el sistema administra los turnos de los "
+     "tres pozos (San Isidro, Zapata y Cárdenas) y a la totalidad de sus socios. La "
+     "rotación se calcula de forma automática todos los días, con el cambio de turno a "
+     "las 18:00 horas, y contempla los días festivos y los días sin servicio. Las "
+     "pruebas ejecutadas sobre los cálculos de rotación arrojaron un 100 % de "
+     "coincidencia con los resultados esperados en los escenarios probados (días "
+     "normales, festivos, días sin servicio y cambios alrededor de las 18:00 horas). "
+     "El servidor y la base de datos operan las 24 horas del día en servicios en la "
+     "nube, y la aplicación quedó compilada y publicada como archivo instalable para "
+     "dispositivos Android.")
+
+h3("Resultados cualitativos")
+parr("Desde el punto de vista cualitativo, la aplicación aportó orden y transparencia a "
+     "la distribución del agua. Los socios manifestaron mayor confianza al poder "
+     "consultar su turno en cualquier momento, y el contador redujo su carga de trabajo "
+     "al contar con una herramienta que automatiza los cálculos y centraliza la "
+     "información. El uso de colores en el calendario facilitó la comprensión inmediata "
+     "de los turnos y de los días especiales, incluso para usuarios sin experiencia "
+     "previa con aplicaciones móviles.")
+
 parr("[ Nota: en este apartado se recomienda insertar las capturas de pantalla de la "
      "aplicación —pantalla de inicio de sesión, calendario de turnos, gestión de "
      "multas, etc.— con su respectivo título de figura en Arial 9, centrado. ]")
@@ -478,15 +500,14 @@ parr("[ Nota: en este apartado se recomienda insertar las capturas de pantalla d
 cap_titulo("Conclusiones")
 h1("Conclusiones del Proyecto")
 parr("El desarrollo de la aplicación para la gestión de los pozos comunitarios "
-     "permitió cumplir con el objetivo general planteado, al obtener un sistema "
-     "híbrido, funcional y publicado, que administra de forma automática los turnos de "
-     "agua de tres pozos. La solución resolvió la problemática de confusión y "
+     "permitió cumplir con el objetivo general planteado, al obtener una aplicación "
+     "móvil para Android, funcional y publicada, que administra de forma automática los "
+     "turnos de agua de tres pozos. La solución resolvió la problemática de confusión y "
      "desorganización que existía con el control manual, aportando transparencia y "
      "confianza a las comunidades.")
 parr("Se comprobó que el uso de tecnologías modernas, como React Native, Expo, "
-     "FastAPI y MongoDB, permite construir soluciones robustas y escalables a partir "
-     "de una sola base de código, aprovechable tanto en dispositivos móviles como en "
-     "navegadores web. La automatización de la rotación de turnos, considerando el "
+     "FastAPI y MongoDB, permite construir aplicaciones móviles nativas para Android "
+     "robustas y escalables. La automatización de la rotación de turnos, considerando el "
      "corte a las 18:00 horas y los días sin servicio, resultó ser el componente de "
      "mayor valor para los usuarios.")
 parr("El proyecto demostró ser pertinente y viable, y sienta las bases para su "
@@ -516,9 +537,9 @@ cap_titulo("Experiencia Personal Profesional Adquirida")
 h1("Experiencia Personal Profesional Adquirida")
 parr("Durante el desarrollo del presente proyecto se adquirieron conocimientos y "
      "habilidades de gran valor para el ejercicio profesional. Se profundizó en el "
-     "manejo de tecnologías actuales para el desarrollo de aplicaciones móviles y web, "
+     "manejo de tecnologías actuales para el desarrollo de aplicaciones móviles Android, "
      "así como en el diseño de bases de datos no relacionales y en la construcción de "
-     "servicios web seguros.")
+     "servicios web (API REST) seguros.")
 parr("Igualmente, se fortalecieron competencias relacionadas con el análisis de "
      "requerimientos, la comunicación con los usuarios finales y la resolución de "
      "problemas reales de una comunidad. La experiencia de llevar un proyecto desde su "
@@ -536,7 +557,7 @@ h1("Competencias Desarrolladas y/o Aplicadas")
 vinieta("Análisis y determinación de requerimientos de software a partir de "
         "necesidades reales.")
 vinieta("Diseño y modelado de bases de datos orientadas a documentos.")
-vinieta("Desarrollo de aplicaciones móviles y web con React Native y Expo.")
+vinieta("Desarrollo de aplicaciones móviles Android con React Native y Expo.")
 vinieta("Construcción de servicios web (API REST) con FastAPI y Python.")
 vinieta("Implementación de mecanismos de seguridad mediante autenticación por tokens "
         "JWT.")
