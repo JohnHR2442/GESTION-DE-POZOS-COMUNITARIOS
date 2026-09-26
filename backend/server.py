@@ -1179,6 +1179,15 @@ async def reporte_residencia():
     )
 
 
+@api.get("/figura-3-1")
+async def figura_3_1():
+    return FileResponse(
+        "/app/figura_3_1.png",
+        media_type="image/png",
+        filename="Figura_3.1_Casos_de_uso.png",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
