@@ -1188,6 +1188,15 @@ async def figura_3_1():
     )
 
 
+@api.get("/figura-3-2")
+async def figura_3_2():
+    return FileResponse(
+        "/app/figura_3_2.png",
+        media_type="image/png",
+        filename="Figura_3.2_Diagrama_de_flujo.png",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
