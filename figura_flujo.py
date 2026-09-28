@@ -72,8 +72,12 @@ flecha(5, 12.85, 5, 12.5)          # inicio -> obtener fecha
 flecha(5, 11.5, 5, 11.05)          # obtener -> decision
 flecha(6.45, 10.3, 6.35, 10.3, "Sí", VERDE)   # decision -> derecha
 flecha(3.55, 10.3, 3.65, 10.3, "No", "#DC2626")  # decision -> izquierda
-flecha(8.0, 9.82, 5.9, 8.9)        # derecha -> merge
-flecha(2.0, 9.82, 4.1, 8.9)        # izquierda -> merge
+# Punto de unión (merge) de las dos ramas
+ax.add_patch(plt.Circle((5, 9.35), 0.16, facecolor="white",
+             edgecolor="#475569", lw=1.6))
+flecha(8.0, 9.82, 5.22, 9.45)      # derecha -> merge
+flecha(2.0, 9.82, 4.78, 9.45)      # izquierda -> merge
+flecha(5, 9.19, 5, 8.9)            # merge -> calcular
 flecha(5, 7.92, 5, 7.4)            # merge -> restar
 flecha(5, 6.42, 5, 5.9)            # restar -> indice
 flecha(5, 4.92, 5, 4.4)            # indice -> turno
