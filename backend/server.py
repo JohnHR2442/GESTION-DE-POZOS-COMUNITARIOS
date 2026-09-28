@@ -1209,6 +1209,15 @@ async def figura_4(n: str):
     return FileResponse(f"/app/{archivo}", media_type="image/png", filename=nombre)
 
 
+@api.get("/tabla-4-1")
+async def tabla_4_1():
+    return FileResponse(
+        "/app/tabla_4_1.png",
+        media_type="image/png",
+        filename="Tabla_4.1_Casos_de_prueba.png",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
