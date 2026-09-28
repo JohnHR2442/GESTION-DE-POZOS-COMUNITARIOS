@@ -1197,6 +1197,18 @@ async def figura_3_2():
     )
 
 
+@api.get("/figura-4-{n}")
+async def figura_4(n: str):
+    mapa = {
+        "1": ("figura_4_1.png", "Figura_4.1_Inicio_de_sesion.png"),
+        "2": ("figura_4_2.png", "Figura_4.2_Calendario_de_turnos.png"),
+        "3": ("figura_4_3.png", "Figura_4.3_Gestion_de_multas.png"),
+        "4": ("figura_4_4.png", "Figura_4.4_Registro_de_recorridos.png"),
+    }
+    archivo, nombre = mapa.get(n, mapa["1"])
+    return FileResponse(f"/app/{archivo}", media_type="image/png", filename=nombre)
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
