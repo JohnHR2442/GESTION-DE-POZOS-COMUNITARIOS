@@ -1227,6 +1227,15 @@ async def tablas_variables():
     )
 
 
+@api.get("/capitulo-3")
+async def capitulo_3():
+    return FileResponse(
+        "/app/Capitulo_III_Marco_Metodologico.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Capitulo_III_Marco_Metodologico.docx",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
