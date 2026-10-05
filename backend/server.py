@@ -1218,6 +1218,15 @@ async def tabla_4_1():
     )
 
 
+@api.get("/tablas-variables")
+async def tablas_variables():
+    return FileResponse(
+        "/app/Tablas_Variables_Hipotesis.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Tablas_Variables_Hipotesis.docx",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
