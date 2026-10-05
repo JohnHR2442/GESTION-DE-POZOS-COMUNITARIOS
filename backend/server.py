@@ -1236,6 +1236,15 @@ async def capitulo_3():
     )
 
 
+@api.get("/requerimientos-resultados")
+async def requerimientos_resultados():
+    return FileResponse(
+        "/app/Requerimientos_y_Resultados.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Requerimientos_y_Resultados.docx",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
