@@ -1245,6 +1245,15 @@ async def requerimientos_resultados():
     )
 
 
+@api.get("/punto-412")
+async def punto_412():
+    return FileResponse(
+        "/app/Punto_4-1-2_Eficacia_Eficiencia_Usabilidad.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Punto_4-1-2_Eficacia_Eficiencia_Usabilidad.docx",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
