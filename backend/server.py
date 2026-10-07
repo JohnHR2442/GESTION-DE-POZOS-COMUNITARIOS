@@ -1254,6 +1254,15 @@ async def punto_412():
     )
 
 
+@api.get("/tesis-indices")
+async def tesis_indices():
+    return FileResponse(
+        "/app/Tesis_con_indices.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Tesis_con_indices.docx",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
