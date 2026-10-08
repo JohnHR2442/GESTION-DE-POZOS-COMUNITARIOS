@@ -1263,6 +1263,15 @@ async def tesis_indices():
     )
 
 
+@api.get("/tesis-formato")
+async def tesis_formato():
+    return FileResponse(
+        "/app/Tesis_Formateada.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Tesis_Formateada.docx",
+    )
+
+
 app.include_router(api)
 
 PRIVACY_HTML = """<!DOCTYPE html>
