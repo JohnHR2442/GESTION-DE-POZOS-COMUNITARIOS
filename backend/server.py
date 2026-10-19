@@ -1281,6 +1281,15 @@ async def cronograma():
     )
 
 
+@api.get("/tesis-final")
+async def tesis_final():
+    return FileResponse(
+        "/app/Tesis_Final.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="TESIS SISTEMA INTEGRAL DE GESTION DE POZOS COMUNITARIOS.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
