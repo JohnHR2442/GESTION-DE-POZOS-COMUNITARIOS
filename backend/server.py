@@ -1272,6 +1272,15 @@ async def organigrama():
     )
 
 
+@api.get("/cronograma")
+async def cronograma():
+    return FileResponse(
+        "/app/Cronograma_Residencia.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Cronograma_Residencia.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
