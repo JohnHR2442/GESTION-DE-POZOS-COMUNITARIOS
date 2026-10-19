@@ -1290,6 +1290,15 @@ async def tesis_final():
     )
 
 
+@api.get("/manual-usuario")
+async def manual_usuario():
+    return FileResponse(
+        "/app/Manual_de_Usuario_Turnos_de_Pozo.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Manual_de_Usuario_Turnos_de_Pozo.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
