@@ -1263,6 +1263,15 @@ async def tesis_indices():
     )
 
 
+@api.get("/organigrama")
+async def organigrama():
+    return FileResponse(
+        "/app/organigrama_comisariado.png",
+        media_type="image/png",
+        filename="Organigrama_Comisariado_Ejidal.png",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
