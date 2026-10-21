@@ -37,8 +37,8 @@ plan = {
         ("Conmutación y Enrutamiento de Redes de Datos", None), ("Programación Web", "sel"),
         ("Arquitecturas Reconfigurables", "esp"), ("Gestión de Proyectos de Software", "dir")],
     8: [("Programación de Robots", "esp"), ("Sistemas Programables", None), ("Administración de Redes", "ind"),
-        ("Redes Neuronales Artificiales", "esp"), ("Seguridad en Redes", "esp"),
-        ("Programación en Back y Front End", "sel")],
+        ("Redes Neuronales Artificiales", "esp"), ("Seguridad en Redes", "esp")
+        ],
     9: [("Residencia Profesional", "sel")],
 }
 

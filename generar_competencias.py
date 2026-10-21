@@ -113,12 +113,10 @@ p("En la Tabla 15 se describen las asignaturas cuyas competencias se aplicaron d
   "y la forma concreta en que se utilizaron.")
 caption("Tabla 15. Competencias específicas aplicadas en el proyecto.")
 tabla(["Asignatura", "Competencia aplicada", "Aplicación en el proyecto"], [
-    ("Programación en Back y Front End", "Desarrollar aplicaciones completas integrando la capa del cliente y la del servidor.",
-     "Desarrollo de la aplicación móvil con React Native y Expo, y de la API REST con FastAPI."),
     ("Programación Web", "Diseñar y construir servicios web basados en protocolos estándar.",
-     "Implementación de servicios REST (HTTP/JSON) para turnos, multas, emergencias y notificaciones."),
+     "Desarrollo del servidor con FastAPI e implementación de servicios REST (HTTP/JSON) para turnos, multas, emergencias y notificaciones."),
     ("Tópicos Avanzados de Programación", "Desarrollar interfaces gráficas y aplicaciones para dispositivos móviles.",
-     "Diseño de pantallas, navegación por pestañas, calendario y modo oscuro de la aplicación Android."),
+     "Desarrollo de la aplicación Android con React Native y Expo: pantallas, navegación por pestañas, calendario y modo oscuro."),
     ("Ingeniería de Software", "Aplicar metodologías y modelos para el desarrollo de software de calidad.",
      "Levantamiento de requerimientos funcionales y no funcionales, casos de uso y pruebas de funcionamiento."),
     ("Taller de Base de Datos", "Implementar bases de datos y realizar operaciones de consulta y manipulación.",
@@ -153,42 +151,47 @@ vineta(" aplicación de los conocimientos en la práctica; habilidad de investig
 # ================== APORTE AL PERFIL DE EGRESO ==================
 titulo("Aporte al perfil de egreso")
 p("El proyecto contribuyó al logro de los atributos del perfil de egreso del Ingeniero en Sistemas "
-  "Computacionales establecidos por el Tecnológico Nacional de México. En la Tabla 16 se relaciona cada "
-  "atributo con la evidencia obtenida durante la residencia profesional.")
+  "Computacionales (plan ISIC-2010-224) establecidos por el Tecnológico Nacional de México, cuyo objetivo "
+  "general es formar profesionistas capaces de diseñar, desarrollar, implementar y administrar tecnología "
+  "computacional para aportar soluciones innovadoras en beneficio de la sociedad. En la Tabla 16 se relaciona "
+  "cada atributo con la evidencia obtenida durante la residencia profesional.")
 caption("Tabla 16. Aporte del proyecto al perfil de egreso.")
 tabla(["Atributo del perfil de egreso", "Aporte del proyecto"], [
-    ("Implementar aplicaciones computacionales para solucionar problemas de diversos contextos, integrando "
+    ("1. Implementa aplicaciones computacionales para solucionar problemas de diversos contextos, integrando "
      "diferentes tecnologías, plataformas o dispositivos.",
      "Se integró una aplicación móvil Android, un servidor en la nube y una base de datos para resolver la "
      "asignación de turnos de agua de tres pozos comunitarios."),
-    ("Diseñar, desarrollar y aplicar modelos computacionales para solucionar problemas, mediante la selección "
+    ("2. Diseña, desarrolla y aplica modelos computacionales para solucionar problemas, mediante la selección "
      "y uso de herramientas matemáticas.",
      "Se diseñó el modelo de aritmética modular que calcula el turno diario considerando el corte de las 18:00 "
      "horas, los festivos y los días sin servicio."),
-    ("Diseñar, implementar y administrar bases de datos optimizando los recursos disponibles, conforme a las "
-     "normas vigentes de manejo y seguridad de la información.",
-     "Se implementó y administró la base de datos en MongoDB Atlas, con control de acceso por roles y "
-     "protección de las contraseñas."),
-    ("Desarrollar y administrar software para apoyar la productividad y competitividad de las organizaciones "
-     "cumpliendo con estándares de calidad.",
-     "El sistema sustituyó el control manual en libretas, redujo los tiempos de consulta y dio transparencia al "
-     "registro de multas del Comisariado."),
-    ("Coordinar y participar en equipos multidisciplinarios para la aplicación de soluciones innovadoras en "
+    ("3. Diseña e implementa interfaces para la automatización de sistemas de hardware y desarrollo del "
+     "software asociado.",
+     "Aporte parcial: el proyecto se centró en software; se desarrollaron las interfaces de usuario y la "
+     "comunicación con el servidor que automatizan el control de turnos, sin integración de hardware."),
+    ("4. Coordina y participa en equipos multidisciplinarios para la aplicación de soluciones innovadoras en "
      "diferentes contextos.",
      "Se trabajó con el Comisariado Ejidal, el Subcomité Técnico de Aguas, contadores y socios para validar "
      "los requerimientos y realizar las pruebas."),
-    ("Detectar áreas de oportunidad empleando una visión empresarial para crear proyectos aplicando las "
-     "tecnologías de la información y comunicación.",
+    ("5. Diseña, implementa y administra bases de datos optimizando los recursos disponibles, conforme a las "
+     "normas vigentes de manejo y seguridad de la información.",
+     "Se diseñó, implementó y administró la base de datos en MongoDB Atlas, con control de acceso por roles y "
+     "contraseñas cifradas."),
+    ("6. Desarrolla y administra software para apoyar la productividad y competitividad de las organizaciones "
+     "cumpliendo con estándares de calidad.",
+     "El sistema sustituyó el control manual en libretas, redujo los tiempos de consulta y dio transparencia al "
+     "registro de multas del Comisariado."),
+    ("7. Evalúa tecnologías de hardware para soportar aplicaciones de manera efectiva.",
+     "Se definieron los requisitos mínimos de los teléfonos Android de los usuarios y se evaluaron los recursos "
+     "del servidor en la nube (Render) y de la base de datos (MongoDB Atlas) para soportar la aplicación."),
+    ("8. Detecta áreas de oportunidad empleando una visión empresarial para crear proyectos aplicando las "
+     "Tecnologías de la Información y Comunicación.",
      "Se identificó la falta de control en el reparto de agua como área de oportunidad y se resolvió con una "
      "solución digital de bajo costo."),
-    ("Diseñar e implementar soluciones de conectividad y seguridad de la información aplicando normas y "
-     "estándares vigentes.",
-     "Se implementó autenticación con JWT, comunicación cifrada mediante HTTPS y despliegue en servidores "
-     "en la nube."),
-    ("Desempeñar sus actividades profesionales considerando los aspectos legales, éticos, sociales y de "
-     "desarrollo sustentable.",
-     "El proyecto favorece el uso equitativo y sustentable del agua y se publicó en Google Play cumpliendo sus "
-     "políticas de privacidad."),
+    ("9. Diseña, configura y administra redes de computadoras para crear soluciones de conectividad en la "
+     "organización, aplicando las normas y estándares vigentes.",
+     "Se configuró la comunicación cliente-servidor por internet mediante HTTPS y autenticación con JWT, "
+     "permitiendo que los socios consulten la información desde cualquier lugar."),
 ], [7.5, 8.5])
 fuente()
 
@@ -220,8 +223,8 @@ ns2.left_margin, ns2.right_margin = Cm(3), Cm(2.5)
 p("En la Tabla 17 se resume la clasificación de las asignaturas representadas en el grafo.")
 caption("Tabla 17. Clasificación de asignaturas según su relación con el proyecto.")
 tabla(["Clasificación", "Asignaturas", "Total"], [
-    ("Seleccionada", "Programación en Back y Front End, Programación Web, Tópicos Avanzados de Programación, "
-     "Ingeniería de Software, Taller de Base de Datos y Residencia Profesional.", "6"),
+    ("Seleccionada", "Programación Web, Tópicos Avanzados de Programación, Ingeniería de Software, "
+     "Taller de Base de Datos y Residencia Profesional.", "5"),
     ("Aporte directo", "Matemáticas Discretas, Fundamentos de Base de Datos, Fundamentos de Ingeniería de Software, "
      "Redes de Computadoras, Administración de Bases de Datos y Gestión de Proyectos de Software.", "6"),
     ("Aporte indirecto", "Probabilidad y Estadística, Sistemas Operativos, Taller de Investigación I, "
