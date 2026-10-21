@@ -39,7 +39,7 @@ plan = {
     8: [("Programación de Robots", "esp"), ("Sistemas Programables", None), ("Administración de Redes", "ind"),
         ("Redes Neuronales Artificiales", "esp"), ("Seguridad en Redes", "esp")
         ],
-    9: [("Residencia Profesional", "sel")],
+    9: [("Residencia Profesional", None)],
 }
 
 W, H, GX, GY = 1.0, 0.62, 0.22, 0.2

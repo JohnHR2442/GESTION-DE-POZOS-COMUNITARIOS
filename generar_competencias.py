@@ -154,7 +154,7 @@ p("El proyecto contribuyó al logro de los atributos del perfil de egreso del In
   "Computacionales (plan ISIC-2010-224) establecidos por el Tecnológico Nacional de México, cuyo objetivo "
   "general es formar profesionistas capaces de diseñar, desarrollar, implementar y administrar tecnología "
   "computacional para aportar soluciones innovadoras en beneficio de la sociedad. En la Tabla 16 se relaciona "
-  "cada atributo con la evidencia obtenida durante la residencia profesional.")
+  "cada atributo con la evidencia obtenida durante el desarrollo del proyecto.")
 caption("Tabla 16. Aporte del proyecto al perfil de egreso.")
 tabla(["Atributo del perfil de egreso", "Aporte del proyecto"], [
     ("1. Implementa aplicaciones computacionales para solucionar problemas de diversos contextos, integrando "
@@ -223,9 +223,9 @@ ns2.left_margin, ns2.right_margin = Cm(3), Cm(2.5)
 p("En la Tabla 17 se resume la clasificación de las asignaturas representadas en el grafo.")
 caption("Tabla 17. Clasificación de asignaturas según su relación con el proyecto.")
 tabla(["Clasificación", "Asignaturas", "Total"], [
-    ("Seleccionada", "Programación Web, Tópicos Avanzados de Programación, Ingeniería de Software, "
-     "Taller de Base de Datos y Residencia Profesional.", "5"),
-    ("Aporte directo", "Matemáticas Discretas, Fundamentos de Base de Datos, Fundamentos de Ingeniería de Software, "
+    ("Seleccionada", "Programación Web, Tópicos Avanzados de Programación, Ingeniería de Software "
+     "y Taller de Base de Datos.", "4"),
+    ("Aporte directo", "Matemáticas Discretas, Fundamentos de Base de Datos, Fundamentos de Ingeniería de Software "
      "Redes de Computadoras, Administración de Bases de Datos y Gestión de Proyectos de Software.", "6"),
     ("Aporte indirecto", "Probabilidad y Estadística, Sistemas Operativos, Taller de Investigación I, "
      "Taller de Investigación II y Administración de Redes.", "5"),
