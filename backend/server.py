@@ -1299,6 +1299,15 @@ async def manual_usuario():
     )
 
 
+@api.get("/competencias")
+async def competencias():
+    return FileResponse(
+        "/app/Competencias_Desarrolladas.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Competencias_Desarrolladas.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
