@@ -1308,6 +1308,15 @@ async def competencias():
     )
 
 
+@api.get("/tesis-corregida")
+async def tesis_corregida():
+    return FileResponse(
+        "/app/Tesis_Corregida.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="TESIS SISTEMA INTEGRAL DE GESTION DE POZOS COMUNITARIOS.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(

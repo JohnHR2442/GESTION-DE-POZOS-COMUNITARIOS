@@ -50,7 +50,7 @@ caja(3.6, 3.4, "Subcomité Técnico de Aguas", "y Pozos Hidráulicos · Encargad
 
 # Nivel 5
 caja(1.9, 1.6, "Auxiliar Técnico", "Capturista de datos")
-caja(5.6, 1.6, "Estudiante Residente", "Desarrollador de Software e Innovación",
+caja(5.6, 1.6, "Desarrollador del Sistema", "Egresado de Ing. en Sistemas Computacionales",
      fondo=VERDE_CLARO, borde=VERDE, w=3.4, grosor=2.6)
 
 # Conexiones jerárquicas
@@ -85,7 +85,7 @@ ax.plot([2.8, 3.3], [0.35, 0.35], color="#555555", lw=1.4, ls="--")
 ax.text(3.4, 0.35, "Coordinación / supervisión", fontsize=8, va="center")
 ax.add_patch(FancyBboxPatch((6.0, 0.22), 0.5, 0.26, boxstyle="round,pad=0.01",
                             fc=VERDE_CLARO, ec=VERDE, lw=2))
-ax.text(6.65, 0.35, "Puesto desempeñado por el estudiante", fontsize=8, va="center")
+ax.text(6.65, 0.35, "Puesto desempeñado por el autor del proyecto", fontsize=8, va="center")
 
 plt.savefig("/app/organigrama_comisariado.png", bbox_inches="tight", facecolor="white")
 print("ok")
