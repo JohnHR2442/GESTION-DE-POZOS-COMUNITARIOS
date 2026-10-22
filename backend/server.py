@@ -1326,6 +1326,15 @@ async def manual_referenciado():
     )
 
 
+@api.get("/tesis-anexo")
+async def tesis_anexo():
+    return FileResponse(
+        "/app/Tesis_con_Anexo_Manual.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="TESIS SISTEMA INTEGRAL DE GESTION DE POZOS COMUNITARIOS.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
