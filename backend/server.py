@@ -1335,6 +1335,15 @@ async def tesis_anexo():
     )
 
 
+@api.get("/glosario")
+async def glosario():
+    return FileResponse(
+        "/app/Glosario_de_Terminos.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Glosario_de_Terminos.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
