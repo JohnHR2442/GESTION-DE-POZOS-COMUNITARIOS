@@ -203,14 +203,16 @@ ns.top_margin = ns.bottom_margin = Cm(2)
 ns.left_margin = ns.right_margin = Cm(2.5)
 
 titulo("Grafos del proyecto")
-p("La Figura 14 muestra el grafo de la retícula de Ingeniería en Sistemas Computacionales, en el que se "
-  "identifica con colores la relación de cada asignatura con el proyecto: las seleccionadas se aplicaron "
-  "directamente; las de aporte directo e indirecto apoyaron el desarrollo; las de competencia previa "
-  "constituyeron la base de conocimientos, y las de especialidad corresponden al módulo cursado.")
+p("La Figura 14 presenta el grafo de competencias profesionales aplicadas en el proyecto. Las asignaturas "
+  "de la retícula de Ingeniería en Sistemas Computacionales se agrupan en seis áreas: lógica y algoritmos; "
+  "ingeniería de software; móvil, web y conectividad; bases de datos y seguridad; gestión e investigación, y "
+  "ética e impacto social. Cada área incluye la evidencia concreta de su aplicación en el sistema y cada "
+  "asignatura se identifica por color según su relación con el proyecto: aplicación directa, aporte directo, "
+  "aporte indirecto, competencia previa directa, competencia previa indirecta o especialidad.")
 pi = doc.add_paragraph(); pi.alignment = WD_ALIGN_PARAGRAPH.CENTER
 pi.paragraph_format.space_after = Pt(2); pi.paragraph_format.line_spacing = 1.0
 pi.paragraph_format.keep_with_next = True
-pi.add_run().add_picture("/app/grafo_competencias.png", width=Cm(21.5))
+pi.add_run().add_picture("/app/grafo_usuario_recorte.png", width=Cm(19.5))
 caption("Figura 14. Grafo de asignaturas de Ingeniería en Sistemas Computacionales aplicadas en el proyecto.")
 fuente()
 
@@ -223,7 +225,7 @@ ns2.left_margin, ns2.right_margin = Cm(3), Cm(2.5)
 p("En la Tabla 17 se resume la clasificación de las asignaturas representadas en el grafo.")
 caption("Tabla 17. Clasificación de asignaturas según su relación con el proyecto.")
 tabla(["Clasificación", "Asignaturas", "Total"], [
-    ("Seleccionada", "Programación Web, Tópicos Avanzados de Programación, Ingeniería de Software "
+    ("Aplicación directa", "Programación Web, Tópicos Avanzados de Programación, Ingeniería de Software "
      "y Taller de Base de Datos.", "4"),
     ("Aporte directo", "Matemáticas Discretas, Fundamentos de Base de Datos, Fundamentos de Ingeniería de Software "
      "Redes de Computadoras, Administración de Bases de Datos y Gestión de Proyectos de Software.", "6"),
@@ -238,7 +240,9 @@ tabla(["Clasificación", "Asignaturas", "Total"], [
 ], [4.0, 10.5, 1.5])
 fuente()
 p("De las asignaturas de especialidad, Seguridad en Redes fue la de mayor aplicación, al utilizarse en la "
-  "autenticación de usuarios y en la protección de la información del sistema.")
+  "autenticación de usuarios y en la protección de la información del sistema. Arquitecturas Reconfigurables, "
+  "Programación de Robots y Redes Neuronales Artificiales forman parte de la retícula cursada, pero no tuvieron "
+  "una aplicación técnica directa documentada en el proyecto.")
 
 doc.save("/app/Competencias_Desarrolladas.docx")
 print("ok")
