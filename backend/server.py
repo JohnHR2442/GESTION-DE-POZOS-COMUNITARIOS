@@ -1344,6 +1344,15 @@ async def glosario():
     )
 
 
+@api.get("/manual-pasos")
+async def manual_pasos():
+    return FileResponse(
+        "/app/Manual_de_Usuario_Pasos.docx",
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Manual de usuario.docx",
+    )
+
+
 @api.get("/tesis-formato")
 async def tesis_formato():
     return FileResponse(
