@@ -37,9 +37,9 @@ export function MultaDetailModal({
         <StatusBadge pagado={pagado} />
       </View>
       <Field label="Socio" value={multa.socio_nombre} />
-      <Field label="Descripcion" value={multa.descripcion} />
+      <Field label="Descripción" value={multa.descripcion} />
       <Field label="Monto" value={formatMXN(multa.monto)} />
-      <Field label="Fecha de creacion" value={formatFecha(multa.fecha_creacion)} />
+      <Field label="Fecha de creación" value={formatFecha(multa.fecha_creacion)} />
       {pagado ? <Field label="Fecha de pago" value={formatFecha(multa.fecha_pago)} /> : null}
     </AppModal>
   );

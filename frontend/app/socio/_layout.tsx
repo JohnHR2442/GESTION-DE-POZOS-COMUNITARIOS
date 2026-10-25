@@ -32,7 +32,7 @@ export default function SocioLayout() {
       }}
     >
       <Tabs.Screen name="inicio" options={{ title: "Inicio", tabBarIcon: ({ color, size }) => <Feather name="home" size={size} color={color} /> }} />
-      <Tabs.Screen name="estadisticas" options={{ title: "Estadisticas", tabBarIcon: ({ color, size }) => <Feather name="bar-chart-2" size={size} color={color} /> }} />
+      <Tabs.Screen name="estadisticas" options={{ title: "Estadísticas", tabBarIcon: ({ color, size }) => <Feather name="bar-chart-2" size={size} color={color} /> }} />
       <Tabs.Screen name="historial" options={{ title: "Historial", tabBarIcon: ({ color, size }) => <Feather name="calendar" size={size} color={color} /> }} />
       <Tabs.Screen name="perfil" options={{ title: "Perfil", tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} /> }} />
       <Tabs.Screen name="multas" options={{ href: null }} />

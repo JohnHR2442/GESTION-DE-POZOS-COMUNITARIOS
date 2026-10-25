@@ -1,0 +1,30 @@
+{
+  "summary": "Frontend-only, read-only accent/spelling check at 390x844 on http://localhost:3000 (production backend, only logins done, no data created). All the requested strings show up with correct accents: Home, Login (labels and placeholders), /recuperar step 1, socio Inicio legend 'Turno caído', emergency modal ('Fuga en tubería', 'Baja presión de agua', 'Se notificará a todo el pozo'), Estadísticas ('Mis turnos (año)', 'Días sin servicio'), agua-sobra '¿Cuántas horas te sobran?', Perfil ('Cambiar contraseña', 'Contraseña actual', 'Nueva contraseña', 'Actualizar contraseña', 'Cerrar sesión'), contador recorrido hint, the day modal 'Turno caído' option, and the Multas form label 'Descripción'. Historial loads and shows '3 turnos en Octubre 2026'. None of the listed unaccented forms appear on any visited screen. No crashes or blank screens. 3 accents are still missing: '¿Por que es el recorrido?' and 2x '¿Estas seguro'.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "contador/recorrido day modal", "issue": "Missing accent: '¿Por que es el recorrido?' should be '¿Por qué es el recorrido?'. Reference: /app/frontend/app/contador/recorrido.tsx:117", "testID": "tipo-turno-caido", "priority": "MEDIUM"},
+      {"component": "socio/agua-sobra confirm modal", "issue": "Missing accent: '¿Estas seguro que te sobran ' and '¿Estas seguro de las horas que ya no te sobran ' should be '¿Estás seguro ...'. Seen in code only; not opened in UI so no data gets submitted. Reference: /app/frontend/app/socio/agua-sobra.tsx:107", "testID": "horas-picker", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "socio and contador bottom tabs (web preview)", "issues": ["Tab bar labels are clipped at the bottom, with only about 7px of the label visible (Perfil label rect 826-833 at 844 height). tabBarStyle height is 58+insets with 6px top and bottom padding. This was there before this change and is not caused by the text edits. Raise the height to about 64 or reduce the padding. Reference: /app/frontend/app/socio/_layout.tsx:24-30 and contador/_layout.tsx"]}
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": [".screenshots/home.png", ".screenshots/login.png", ".screenshots/recuperar.png", ".screenshots/inicio.png", ".screenshots/emerg.png", ".screenshots/stats.png", ".screenshots/hist.png", ".screenshots/agua.png", ".screenshots/perfil.png", ".screenshots/multaform.png", ".screenshots/recorrido.png", ".screenshots/recmodal.png"],
+  "action_items": [
+    "Fix '¿Por que es el recorrido?' to '¿Por qué es el recorrido?' (frontend/app/contador/recorrido.tsx:117)",
+    "Fix '¿Estas seguro' to '¿Estás seguro' (2 places, frontend/app/socio/agua-sobra.tsx:107)",
+    "Optional: seed or DB data shows 'Cardenas' (should be 'Cárdenas') and 'Jose' (should be 'José'). This is stored data in backend/server.py:380 and :351, so it needs a DB update in production, not just a code edit.",
+    "Optional: fix the clipped bottom tab labels"
+  ],
+  "critical_code_review_comments": ["The grep shows identifiers, testIDs, routes and API keys were left unchanged as intended (turno_caido, descripcion, estadisticas, /dias-sin-servicio)."],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "95% (all requested strings OK; 3 missed accents found in other strings)"},
+  "seed_data_creation": "None. Read-only test; the only actions were logins.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "The preview frontend uses the PRODUCTION backend at EXPO_PUBLIC_API_URL (onrender). Keep tests read-only. Useful testIDs: pozo-card-isidro, btn-iniciar-sesion, input-email, input-password, btn-login, action-emergencia, action-agua, modal-close, fab-nueva-multa, multa-form-modal, dia-YYYY-MM-DD, tipo-turno-caido.",
+  "rca_of_issue": "The accent pass missed interrogative 'qué' and 'Estás' inside '¿...?' strings."
+}

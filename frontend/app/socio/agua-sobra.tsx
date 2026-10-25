@@ -78,7 +78,7 @@ export default function AguaSobra() {
               <Feather name="droplet" size={32} color="#FFFFFF" />
             </View>
 
-            <Text style={[styles.question, { color: colors.onSurface }]}>¿Cuantas horas te sobran?</Text>
+            <Text style={[styles.question, { color: colors.onSurface }]}>¿Cuántas horas te sobran?</Text>
             <Pressable onPress={() => setPickerFor("add")} testID="combo-agregar" style={[styles.combo, { backgroundColor: colors.surfaceSecondary, borderColor: colors.border }]}>
               <Text style={[styles.comboText, { color: colors.muted }]}>Selecciona las horas</Text>
               <Feather name="chevron-down" size={22} color={colors.muted} />
@@ -104,7 +104,7 @@ export default function AguaSobra() {
         {step === "confirm" && confirm ? (
           <View style={styles.centerBlock}>
             <Text style={[styles.confirmMsg, { color: colors.onSurface }]}>
-              {confirm.tipo === "add" ? "¿Estas seguro que te sobran " : "¿Estas seguro de las horas que ya no te sobran "}
+              {confirm.tipo === "add" ? "¿Estás seguro que te sobran " : "¿Estás seguro de las horas que ya no te sobran "}
               <Text style={{ color: colors.error, fontWeight: "800" }}>{confirm.horas} hora{confirm.horas === 1 ? "" : "s"}</Text>
               ?
             </Text>

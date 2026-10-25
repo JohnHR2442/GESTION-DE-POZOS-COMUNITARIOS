@@ -18,9 +18,9 @@ import { localTodayIso } from "@/src/utils/date";
 import { spacing, radius, fontSize } from "@/src/theme/colors";
 
 const EMERGENCIAS = [
-  { tipo: "tuberia", label: "Fuga en tuberia", icon: "git-merge" },
+  { tipo: "tuberia", label: "Fuga en tubería", icon: "git-merge" },
   { tipo: "hidrante", label: "Problema en hidrante", icon: "alert-octagon" },
-  { tipo: "presion", label: "Baja presion de agua", icon: "trending-down" },
+  { tipo: "presion", label: "Baja presión de agua", icon: "trending-down" },
 ];
 
 export default function SocioInicio() {
@@ -123,7 +123,7 @@ export default function SocioInicio() {
             <Calendar dias={dias} accent={accent} highlightSocioId={user?.id} />
             <View style={styles.legend}>
               <Legend color={accent} label="Tu turno" />
-              <Legend color={colors.success} label="Turno caido" />
+              <Legend color={colors.success} label="Turno caído" />
               <Legend color={colors.error} label="Emergencia / festivo" />
             </View>
           </View>
@@ -131,7 +131,7 @@ export default function SocioInicio() {
       </ScrollView>
 
       <AppModal visible={showEmergencia} onClose={() => setShowEmergencia(false)} title="Reportar emergencia" testID="emergencia-modal">
-        <Text style={[styles.modalHint, { color: colors.muted }]}>Selecciona el tipo de emergencia. Se notificara a todo el pozo.</Text>
+        <Text style={[styles.modalHint, { color: colors.muted }]}>Selecciona el tipo de emergencia. Se notificará a todo el pozo.</Text>
         {EMERGENCIAS.map((e) => (
           <Pressable
             key={e.tipo}

@@ -40,7 +40,7 @@ export default function Recuperar() {
 
   const verificarCodigo = async () => {
     setError("");
-    if (code.trim().length !== 6) { setError("El codigo es de 6 digitos."); return; }
+    if (code.trim().length !== 6) { setError("El código es de 6 dígitos."); return; }
     setLoading(true);
     try {
       await api.post("/auth/reset/verify", { email: email.trim().toLowerCase(), code: code.trim() });
@@ -54,8 +54,8 @@ export default function Recuperar() {
 
   const guardarPassword = async () => {
     setError("");
-    if (pass1.length < 6) { setError("La contrasena debe tener al menos 6 caracteres."); return; }
-    if (pass1 !== pass2) { setError("Las contrasenas no coinciden."); return; }
+    if (pass1.length < 6) { setError("La contraseña debe tener al menos 6 caracteres."); return; }
+    if (pass1 !== pass2) { setError("Las contraseñas no coinciden."); return; }
     setLoading(true);
     try {
       await api.post("/auth/reset/confirm", { email: email.trim().toLowerCase(), code: code.trim(), new_password: pass1 });
@@ -81,7 +81,7 @@ export default function Recuperar() {
         <View style={[styles.logo, { backgroundColor: brand }]}>
           <Feather name={step === 4 ? "check" : "lock"} size={32} color="#FFFFFF" />
         </View>
-        <Text style={[styles.title, { color: colors.onSurface }]}>Recuperar contrasena</Text>
+        <Text style={[styles.title, { color: colors.onSurface }]}>Recuperar contraseña</Text>
 
         <View style={styles.steps}>
           {[1, 2, 3].map((n) => (
@@ -92,7 +92,7 @@ export default function Recuperar() {
         {step === 1 ? (
           <>
             <Text style={[styles.hint, { color: colors.onSurfaceTertiary }]}>
-              Escribe el correo de tu cuenta. El codigo se enviara al comisariado, quien te lo dara.
+              Escribe el correo de tu cuenta. El código se enviará al comisariado, quien te lo dará.
             </Text>
             <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Correo del socio</Text>
             <TextInput testID="reset-email" value={email} onChangeText={setEmail} placeholder="Escribe tu correo" placeholderTextColor={colors.muted} autoCapitalize="none" keyboardType="email-address" style={inputStyle} />
@@ -104,9 +104,9 @@ export default function Recuperar() {
         {step === 2 ? (
           <>
             <Text style={[styles.hint, { color: colors.onSurfaceTertiary }]}>
-              Introduce el codigo de 6 digitos que te dio el comisariado. Vence en 15 minutos.
+              Introduce el código de 6 dígitos que te dio el comisariado. Vence en 15 minutos.
             </Text>
-            <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Codigo</Text>
+            <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Código</Text>
             <TextInput testID="reset-code" value={code} onChangeText={(t) => setCode(t.replace(/[^0-9]/g, ""))} placeholder="000000" placeholderTextColor={colors.muted} keyboardType="number-pad" maxLength={6} style={[inputStyle, styles.codeInput]} />
             {error ? <Text style={[styles.error, { color: colors.error }]} testID="reset-error">{error}</Text> : null}
             <Button title="Entrar" testID="reset-verify" onPress={verificarCodigo} loading={loading} style={{ marginTop: spacing.lg }} />
@@ -115,22 +115,22 @@ export default function Recuperar() {
 
         {step === 3 ? (
           <>
-            <Text style={[styles.hint, { color: colors.onSurfaceTertiary }]}>Crea tu nueva contrasena.</Text>
-            <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Nueva contrasena</Text>
-            <TextInput testID="reset-pass1" value={pass1} onChangeText={setPass1} placeholder="Nueva contrasena" placeholderTextColor={colors.muted} secureTextEntry style={inputStyle} />
-            <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Confirmar contrasena</Text>
-            <TextInput testID="reset-pass2" value={pass2} onChangeText={setPass2} placeholder="Repite la contrasena" placeholderTextColor={colors.muted} secureTextEntry style={inputStyle} />
+            <Text style={[styles.hint, { color: colors.onSurfaceTertiary }]}>Crea tu nueva contraseña.</Text>
+            <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Nueva contraseña</Text>
+            <TextInput testID="reset-pass1" value={pass1} onChangeText={setPass1} placeholder="Nueva contraseña" placeholderTextColor={colors.muted} secureTextEntry style={inputStyle} />
+            <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Confirmar contraseña</Text>
+            <TextInput testID="reset-pass2" value={pass2} onChangeText={setPass2} placeholder="Repite la contraseña" placeholderTextColor={colors.muted} secureTextEntry style={inputStyle} />
             {error ? <Text style={[styles.error, { color: colors.error }]} testID="reset-error">{error}</Text> : null}
-            <Button title="Guardar contrasena" testID="reset-save" onPress={guardarPassword} loading={loading} variant="success" style={{ marginTop: spacing.lg }} />
+            <Button title="Guardar contraseña" testID="reset-save" onPress={guardarPassword} loading={loading} variant="success" style={{ marginTop: spacing.lg }} />
           </>
         ) : null}
 
         {step === 4 ? (
           <>
             <Text style={[styles.hint, { color: colors.onSurfaceTertiary, textAlign: "center" }]}>
-              Tu contrasena se actualizo correctamente. Ya puedes iniciar sesion.
+              Tu contraseña se actualizó correctamente. Ya puedes iniciar sesión.
             </Text>
-            <Button title="Ir a iniciar sesion" testID="reset-done" onPress={() => router.replace("/")} style={{ marginTop: spacing.lg }} />
+            <Button title="Ir a iniciar sesión" testID="reset-done" onPress={() => router.replace("/")} style={{ marginTop: spacing.lg }} />
           </>
         ) : null}
       </ScrollView>

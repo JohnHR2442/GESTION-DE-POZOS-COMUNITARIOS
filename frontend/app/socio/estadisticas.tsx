@@ -46,7 +46,7 @@ export default function Estadisticas() {
 
   const kpis = data
     ? [
-        { label: "Mis turnos (ano)", value: String(data.mis_turnos), icon: "calendar", color: accent },
+        { label: "Mis turnos (año)", value: String(data.mis_turnos), icon: "calendar", color: accent },
         { label: "Mis multas", value: String(data.mis_multas), icon: "file-text", color: colors.brand },
         { label: "Monto pendiente", value: formatMXN(data.monto_pendiente), icon: "alert-circle", color: colors.error },
         { label: "Monto pagado", value: formatMXN(data.monto_pagado), icon: "check-circle", color: colors.success },
@@ -68,7 +68,7 @@ export default function Estadisticas() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.surface }}>
-      <Header title="Estadisticas" subtitle={pozo ? `Pozo ${pozo.nombre}` : ""} accent={accent} />
+      <Header title="Estadísticas" subtitle={pozo ? `Pozo ${pozo.nombre}` : ""} accent={accent} />
       {loading ? (
         <ActivityIndicator color={accent} style={{ marginTop: spacing.xxl }} />
       ) : (
@@ -96,7 +96,7 @@ export default function Estadisticas() {
                 paddingLeft="8"
               />
             ) : (
-              <Text style={[styles.emptyChart, { color: colors.muted }]}>Aun no hay multas registradas</Text>
+              <Text style={[styles.emptyChart, { color: colors.muted }]}>Aún no hay multas registradas</Text>
             )}
           </View>
 
@@ -121,7 +121,7 @@ export default function Estadisticas() {
 
           <View style={[styles.card, { backgroundColor: colors.surfaceSecondary, flexDirection: "row", justifyContent: "space-around" }]}>
             <MiniStat label="Emergencias" value={data?.emergencias ?? 0} color={colors.error} />
-            <MiniStat label="Dias sin servicio" value={data?.dias_sin_servicio ?? 0} color={colors.warning} />
+            <MiniStat label="Días sin servicio" value={data?.dias_sin_servicio ?? 0} color={colors.warning} />
             <MiniStat label="Total multas" value={data?.total_multas ?? 0} color={colors.brand} />
           </View>
         </ScrollView>

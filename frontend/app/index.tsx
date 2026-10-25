@@ -45,7 +45,7 @@ export default function Landing() {
       </View>
       <Text style={[styles.title, { color: colors.onSurface }]}>Turnos de Pozo</Text>
       <Text style={[styles.subtitle, { color: colors.muted }]}>
-        Gestion de turnos de agua comunitaria
+        Gestión de turnos de agua comunitaria
       </Text>
 
       <Text style={[styles.section, { color: colors.onSurface }]}>Selecciona tu pozo</Text>
@@ -81,7 +81,7 @@ export default function Landing() {
 
       <View style={styles.actions}>
         <Button
-          title="Iniciar sesion"
+          title="Iniciar sesión"
           testID="btn-iniciar-sesion"
           disabled={!selected}
           onPress={() => router.push(`/login?pozo=${selected}`)}

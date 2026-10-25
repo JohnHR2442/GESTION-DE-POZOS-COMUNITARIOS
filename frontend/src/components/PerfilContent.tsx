@@ -23,13 +23,13 @@ export function PerfilContent({ accent }: { accent?: string }) {
   const handleChange = async () => {
     setMsg(null);
     if (!current || next.length < 6) {
-      setMsg({ type: "err", text: "La nueva contrasena debe tener al menos 6 caracteres." });
+      setMsg({ type: "err", text: "La nueva contraseña debe tener al menos 6 caracteres." });
       return;
     }
     setLoading(true);
     try {
       await changePassword(current, next);
-      setMsg({ type: "ok", text: "Contrasena actualizada correctamente." });
+      setMsg({ type: "ok", text: "Contraseña actualizada correctamente." });
       setCurrent(""); setNext("");
     } catch (e) {
       setMsg({ type: "err", text: apiErrorMessage(e) });
@@ -66,12 +66,12 @@ export function PerfilContent({ accent }: { accent?: string }) {
           <Switch value={isDark} onValueChange={toggle} testID="toggle-dark-mode" />
         </View>
 
-        <Text style={[styles.section, { color: colors.onSurface }]}>Cambiar contrasena</Text>
+        <Text style={[styles.section, { color: colors.onSurface }]}>Cambiar contraseña</Text>
         <TextInput
           testID="input-current-password"
           value={current}
           onChangeText={setCurrent}
-          placeholder="Contrasena actual"
+          placeholder="Contraseña actual"
           placeholderTextColor={colors.muted}
           secureTextEntry
           style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.onSurface, borderColor: colors.border }]}
@@ -80,7 +80,7 @@ export function PerfilContent({ accent }: { accent?: string }) {
           testID="input-new-password"
           value={next}
           onChangeText={setNext}
-          placeholder="Nueva contrasena"
+          placeholder="Nueva contraseña"
           placeholderTextColor={colors.muted}
           secureTextEntry
           style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.onSurface, borderColor: colors.border }]}
@@ -90,10 +90,10 @@ export function PerfilContent({ accent }: { accent?: string }) {
             {msg.text}
           </Text>
         ) : null}
-        <Button title="Actualizar contrasena" testID="btn-change-password" onPress={handleChange} loading={loading} color={accent} style={{ marginTop: spacing.md }} />
+        <Button title="Actualizar contraseña" testID="btn-change-password" onPress={handleChange} loading={loading} color={accent} style={{ marginTop: spacing.md }} />
 
         <Button
-          title="Cerrar sesion"
+          title="Cerrar sesión"
           testID="btn-logout"
           variant="danger"
           onPress={handleLogout}

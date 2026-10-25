@@ -160,12 +160,12 @@ export default function PublicView() {
       <AppModal visible={!!callTarget} onClose={() => setCallTarget(null)} title="Llamar" testID="call-modal">
         <Text style={[styles.modalName, { color: colors.onSurface }]}>{callTarget?.nombre}</Text>
         <Text style={[styles.modalPhone, { color: colors.brand }]}>{callTarget?.telefono}</Text>
-        <Button title={copied ? "Numero copiado" : "Copiar numero"} onPress={copyNumber} variant={copied ? "success" : "primary"} icon={<Feather name={copied ? "check" : "copy"} size={18} color="#FFFFFF" />} style={{ marginTop: spacing.lg }} />
+        <Button title={copied ? "Número copiado" : "Copiar número"} onPress={copyNumber} variant={copied ? "success" : "primary"} icon={<Feather name={copied ? "check" : "copy"} size={18} color="#FFFFFF" />} style={{ marginTop: spacing.lg }} />
       </AppModal>
       <AppModal visible={avisoSeguir} onClose={() => setAvisoSeguir(false)} title="Avisos activados" testID="follow-modal">
         <Text style={[styles.modalName, { color: colors.onSurface }]}>Pozo {pozoNombre}</Text>
         <Text style={[styles.followText, { color: colors.muted }]}>
-          Ahora recibiras los avisos de este pozo: emergencias, multas, recorridos, horas de sobra y dias festivos. En el telefono llegaran como notificacion.
+          Ahora recibirás los avisos de este pozo: emergencias, multas, recorridos, horas de sobra y días festivos. En el teléfono llegarán como notificación.
         </Text>
         <Button title="Entendido" onPress={() => setAvisoSeguir(false)} icon={<Feather name="check" size={18} color="#FFFFFF" />} style={{ marginTop: spacing.lg }} />
       </AppModal>

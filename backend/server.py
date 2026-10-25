@@ -52,16 +52,16 @@ api = APIRouter(prefix="/api")
 
 
 async def send_reset_email(socio_email: str, code: str):
-    """Envia el codigo de recuperacion al correo del comisariado."""
+    """Envía el código de recuperación al correo del comisariado."""
     msg = EmailMessage()
     msg["From"] = GMAIL_ADDRESS
     msg["To"] = GMAIL_ADDRESS
-    msg["Subject"] = f"Codigo de recuperacion - {socio_email}"
+    msg["Subject"] = f"Código de recuperación - {socio_email}"
     msg.set_content(
-        f"El socio {socio_email} solicito recuperar su contrasena.\n\n"
-        f"Codigo de un solo uso: {code}\n"
+        f"El socio {socio_email} solicitó recuperar su contraseña.\n\n"
+        f"Código de un solo uso: {code}\n"
         f"Vigencia: {RESET_CODE_TTL_MIN} minutos.\n\n"
-        f"Entrega este codigo unicamente al socio que lo solicito."
+        f"Entrega este código únicamente al socio que lo solicitó."
     )
     await aiosmtplib.send(
         msg,
@@ -247,10 +247,10 @@ async def get_current_user(creds: Optional[HTTPAuthorizationCredentials] = Depen
     try:
         payload = jwt.decode(creds.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     except JWTError:
-        raise HTTPException(status_code=401, detail="Token invalido o expirado")
+        raise HTTPException(status_code=401, detail="Token inválido o expirado")
     user_id = payload.get("sub")
     if not user_id:
-        raise HTTPException(status_code=401, detail="Token invalido")
+        raise HTTPException(status_code=401, detail="Token inválido")
     user = await db.usuarios.find_one({"id": user_id})
     if not user or not user.get("is_active", True):
         raise HTTPException(status_code=401, detail="Usuario no encontrado")
@@ -259,7 +259,7 @@ async def get_current_user(creds: Optional[HTTPAuthorizationCredentials] = Depen
 
 def require_contador(user=Depends(get_current_user)):
     if user["rol"] != "contador":
-        raise HTTPException(status_code=403, detail="Solo el contador puede realizar esta accion")
+        raise HTTPException(status_code=403, detail="Solo el contador puede realizar esta acción")
     return user
 
 
@@ -306,7 +306,7 @@ def es_dia_laborable(d: date, festivos_mmdd: frozenset, sin_servicio_iso: frozen
 
 
 async def nonworking_sets(pozo: dict):
-    """Devuelve (festivos MM-DD, dias sin servicio ISO) de un pozo."""
+    """Devuelve (festivos MM-DD, días sin servicio ISO) de un pozo."""
     festivos_mmdd = frozenset(pozo.get("festivos", []))
     dss = await db.dias_sin_servicio.find({"pozo_id": pozo["id"]}).to_list(length=1000)
     sin_servicio_iso = frozenset(d["fecha"] for d in dss)
@@ -528,7 +528,7 @@ async def login(req: LoginRequest):
     email = req.email.lower().strip()
     user = await db.usuarios.find_one({"email": email})
     if not user or not verify_password(req.password, user["hashed_password"]):
-        raise HTTPException(status_code=401, detail="Correo o contrasena incorrectos")
+        raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos")
     if not user.get("is_active", True):
         raise HTTPException(status_code=403, detail="Usuario inactivo")
     token = create_token(user["id"], user["rol"], user["pozo_id"])
@@ -550,12 +550,12 @@ async def me(user=Depends(get_current_user)):
 @api.post("/auth/change-password")
 async def change_password(req: ChangePasswordRequest, user=Depends(get_current_user)):
     if not verify_password(req.current_password, user["hashed_password"]):
-        raise HTTPException(status_code=401, detail="La contrasena actual es incorrecta")
+        raise HTTPException(status_code=401, detail="La contraseña actual es incorrecta")
     await db.usuarios.update_one(
         {"id": user["id"]},
         {"$set": {"hashed_password": hash_password(req.new_password)}},
     )
-    return {"detail": "Contrasena actualizada correctamente"}
+    return {"detail": "Contraseña actualizada correctamente"}
 
 
 async def _find_valid_reset(email: str, code: str):
@@ -577,7 +577,7 @@ async def reset_request(req: ResetRequest):
     if not user:
         raise HTTPException(status_code=404, detail="Ese correo no esta registrado")
     if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
-        raise HTTPException(status_code=500, detail="El correo de recuperacion no esta configurado")
+        raise HTTPException(status_code=500, detail="El correo de recuperación no está configurado")
     # invalida codigos previos
     await db.password_resets.delete_many({"email": email})
     code = f"{secrets.randbelow(10 ** 6):06d}"
@@ -592,9 +592,9 @@ async def reset_request(req: ResetRequest):
     try:
         await send_reset_email(email, code)
     except Exception as e:
-        logger.error(f"Error enviando correo de recuperacion: {e}")
-        raise HTTPException(status_code=502, detail="No se pudo enviar el codigo. Intenta de nuevo.")
-    return {"detail": "Se envio un codigo al comisariado."}
+        logger.error(f"Error enviando correo de recuperación: {e}")
+        raise HTTPException(status_code=502, detail="No se pudo enviar el código. Intenta de nuevo.")
+    return {"detail": "Se envió un código al comisariado."}
 
 
 @api.post("/auth/reset/verify")
@@ -602,7 +602,7 @@ async def reset_verify(req: ResetVerify):
     email = req.email.lower().strip()
     doc = await _find_valid_reset(email, req.code.strip())
     if not doc:
-        raise HTTPException(status_code=400, detail="Codigo invalido o expirado")
+        raise HTTPException(status_code=400, detail="Código inválido o expirado")
     return {"valid": True}
 
 
@@ -611,13 +611,13 @@ async def reset_confirm(req: ResetConfirm):
     email = req.email.lower().strip()
     doc = await _find_valid_reset(email, req.code.strip())
     if not doc:
-        raise HTTPException(status_code=400, detail="Codigo invalido o expirado")
+        raise HTTPException(status_code=400, detail="Código inválido o expirado")
     await db.usuarios.update_one(
         {"email": email},
         {"$set": {"hashed_password": hash_password(req.new_password)}},
     )
     await db.password_resets.delete_many({"email": email})
-    return {"detail": "Contrasena actualizada. Ya puedes iniciar sesion."}
+    return {"detail": "Contraseña actualizada. Ya puedes iniciar sesión."}
 
 
 # ---------------------------------------------------------------------------
@@ -725,11 +725,11 @@ async def crear_dia_sin_servicio(req: DiaSinServicioCreate, user=Depends(get_cur
     if user.get("rol") != "contador":
         raise HTTPException(status_code=403, detail="Solo el contador puede registrar recorridos")
     if req.tipo not in ("turno_caido", "emergencia"):
-        raise HTTPException(status_code=400, detail="Tipo de recorrido invalido")
+        raise HTTPException(status_code=400, detail="Tipo de recorrido inválido")
     existing = await db.dias_sin_servicio.find_one({"pozo_id": user["pozo_id"], "fecha": req.fecha})
     if existing:
-        raise HTTPException(status_code=400, detail="Ese dia ya esta marcado sin servicio")
-    tipo_label = "Turno caido" if req.tipo == "turno_caido" else "Emergencia"
+        raise HTTPException(status_code=400, detail="Ese día ya está marcado sin servicio")
+    tipo_label = "Turno caído" if req.tipo == "turno_caido" else "Emergencia"
     doc = {
         "id": str(uuid.uuid4()),
         "pozo_id": user["pozo_id"],
@@ -742,7 +742,7 @@ async def crear_dia_sin_servicio(req: DiaSinServicioCreate, user=Depends(get_cur
     await db.dias_sin_servicio.insert_one(doc)
     await crear_notificacion(
         user["pozo_id"], "sin_servicio", "Recorrido registrado",
-        f"El {req.fecha} se marco como dia sin servicio ({tipo_label}).",
+        f"El {req.fecha} se marcó como día sin servicio ({tipo_label}).",
     )
     return clean(doc)
 
@@ -761,16 +761,16 @@ async def borrar_dia_sin_servicio(dss_id: str, user=Depends(get_current_user)):
 # Routes: Emergencias
 # ---------------------------------------------------------------------------
 EMERGENCIA_LABELS = {
-    "tuberia": "Fuga en tuberia",
+    "tuberia": "Fuga en tubería",
     "hidrante": "Problema en hidrante",
-    "presion": "Baja presion de agua",
+    "presion": "Baja presión de agua",
 }
 
 
 @api.post("/emergencias")
 async def crear_emergencia(req: EmergenciaCreate, user=Depends(get_current_user)):
     if req.tipo not in EMERGENCIA_LABELS:
-        raise HTTPException(status_code=400, detail="Tipo de emergencia invalido")
+        raise HTTPException(status_code=400, detail="Tipo de emergencia inválido")
     doc = {
         "id": str(uuid.uuid4()),
         "pozo_id": user["pozo_id"],
@@ -833,7 +833,7 @@ async def crear_multa(req: MultaCreate, user=Depends(require_contador)):
     await crear_notificacion(
         user["pozo_id"], "multa",
         "Nueva multa registrada",
-        f"Se te asigno una multa de ${doc['monto']:,.2f} MXN: {req.descripcion}.",
+        f"Se te asignó una multa de ${doc['monto']:,.2f} MXN: {req.descripcion}.",
         destinatario=socio["id"],
     )
     return clean(doc)
@@ -902,7 +902,7 @@ async def agregar_horas_sobra(body: AguaSobraBody, user=Depends(get_current_user
     pozo = await db.pozos.find_one({"id": user["pozo_id"]})
     await crear_notificacion(
         user["pozo_id"], "agua_sobra", "Horas de sobra",
-        f"Pozo {pozo['nombre']} indico que tiene horas de sobra.",
+        f"Pozo {pozo['nombre']} indicó que tiene horas de sobra.",
     )
     return {"horas_sobra": nuevo}
 
@@ -1147,8 +1147,8 @@ async def revisar_festivos():
                 continue
             fecha_txt = f"{DIAS_ES[h.weekday()]} {h.day} de {MESES_ES[h.month - 1]}"
             await crear_notificacion(
-                pozo["id"], "festivo", "Dia festivo",
-                f"Recordatorio: no se laborara el {fecha_txt} por ser dia festivo.",
+                pozo["id"], "festivo", "Día festivo",
+                f"Recordatorio: no se laborará el {fecha_txt} por ser día festivo.",
             )
             await db.festivo_avisos.insert_one({"key": key, "fecha": now_utc().isoformat()})
 
@@ -1369,7 +1369,7 @@ PRIVACY_HTML = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Politica de Privacidad - Turnos de Pozo</title>
+<title>Política de Privacidad - Turnos de Pozo</title>
 <style>
 body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:760px;margin:0 auto;padding:24px;color:#1f2937;line-height:1.6}
 h1{color:#0284C7}h2{color:#0369a1;margin-top:28px}
@@ -1378,47 +1378,47 @@ footer{margin-top:40px;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb
 </style>
 </head>
 <body>
-<h1>Politica de Privacidad</h1>
-<p class="fecha">Aplicacion: Turnos de Pozo (Gestion de Pozos Comunitarios). Ultima actualizacion: septiembre 2026.</p>
+<h1>Política de Privacidad</h1>
+<p class="fecha">Aplicación: Turnos de Pozo (Gestión de Pozos Comunitarios). Última actualización: septiembre 2026.</p>
 
-<p>Esta aplicacion ("la App") gestiona los turnos de riego de tres pozos comunitarios y el envio de avisos a sus socios y usuarios. Respetamos tu privacidad y solo usamos la informacion necesaria para el funcionamiento del servicio.</p>
+<p>Esta aplicación ("la App") gestiona los turnos de riego de tres pozos comunitarios y el envío de avisos a sus socios y usuarios. Respetamos tu privacidad y solo usamos la información necesaria para el funcionamiento del servicio.</p>
 
-<h2>1. Informacion que recopilamos</h2>
+<h2>1. Información que recopilamos</h2>
 <ul>
-<li><strong>Datos de cuenta (solo socios y contadores):</strong> nombre, correo electronico y numero de telefono, para identificar al usuario y mostrar el turno correspondiente.</li>
-<li><strong>Token de notificaciones:</strong> un identificador del dispositivo que permite enviar avisos push (emergencias, multas, recorridos, horas de sobra y dias festivos). Se asocia a los pozos que el usuario decide seguir.</li>
-<li><strong>Datos de uso de la App:</strong> multas, emergencias reportadas, dias sin servicio y horas de sobra que los propios usuarios registran.</li>
+<li><strong>Datos de cuenta (solo socios y contadores):</strong> nombre, correo electrónico y número de teléfono, para identificar al usuario y mostrar el turno correspondiente.</li>
+<li><strong>Token de notificaciones:</strong> un identificador del dispositivo que permite enviar avisos push (emergencias, multas, recorridos, horas de sobra y días festivos). Se asocia a los pozos que el usuario decide seguir.</li>
+<li><strong>Datos de uso de la App:</strong> multas, emergencias reportadas, días sin servicio y horas de sobra que los propios usuarios registran.</li>
 </ul>
 
-<h2>2. Como usamos la informacion</h2>
+<h2>2. Cómo usamos la información</h2>
 <ul>
 <li>Para mostrar los turnos, socios y avisos de cada pozo.</li>
 <li>Para enviar notificaciones a los dispositivos que eligieron seguir un pozo.</li>
-<li>Para permitir el inicio de sesion y la recuperacion de contrasena.</li>
+<li>Para permitir el inicio de sesión y la recuperación de contraseña.</li>
 </ul>
 
 <h2>3. Notificaciones push</h2>
-<p>Las notificaciones se entregan a traves del servicio de mensajeria de Expo y de los sistemas de Google (Firebase Cloud Messaging) y Apple (APNs). El unico dato compartido con ellos es el token del dispositivo, indispensable para la entrega del aviso.</p>
+<p>Las notificaciones se entregan a través del servicio de mensajería de Expo y de los sistemas de Google (Firebase Cloud Messaging) y Apple (APNs). El unico dato compartido con ellos es el token del dispositivo, indispensable para la entrega del aviso.</p>
 
-<h2>4. Con quien compartimos la informacion</h2>
-<p>No vendemos ni alquilamos tus datos. La informacion se guarda en nuestra base de datos privada (MongoDB Atlas) y solo se comparte con los proveedores tecnicos indispensables para el funcionamiento de las notificaciones.</p>
+<h2>4. Con quién compartimos la información</h2>
+<p>No vendemos ni alquilamos tus datos. La información se guarda en nuestra base de datos privada (MongoDB Atlas) y solo se comparte con los proveedores tecnicos indispensables para el funcionamiento de las notificaciones.</p>
 
 <h2>5. Permisos del dispositivo</h2>
-<p>La App solicita permiso de <strong>Notificaciones</strong> unicamente para poder enviarte los avisos del pozo. Puedes desactivarlas en cualquier momento desde la configuracion de tu telefono o dejando de seguir el pozo dentro de la App.</p>
+<p>La App solicita permiso de <strong>Notificaciones</strong> únicamente para poder enviarte los avisos del pozo. Puedes desactivarlas en cualquier momento desde la configuración de tu teléfono o dejando de seguir el pozo dentro de la App.</p>
 
-<h2>6. Conservacion y eliminacion de datos</h2>
-<p>Los datos se conservan mientras la cuenta este activa. Si deseas eliminar tu informacion o tu cuenta, contactanos al correo indicado abajo.</p>
+<h2>6. Conservación y eliminación de datos</h2>
+<p>Los datos se conservan mientras la cuenta esté activa. Si deseas eliminar tu información o tu cuenta, contactanos al correo indicado abajo.</p>
 
 <h2>7. Menores de edad</h2>
 <p>La App esta dirigida a los socios y usuarios de los pozos comunitarios y no esta pensada para menores de edad.</p>
 
-<h2>8. Cambios a esta politica</h2>
-<p>Podemos actualizar esta politica cuando sea necesario. La fecha de la ultima actualizacion aparece al inicio de esta pagina.</p>
+<h2>8. Cambios a esta política</h2>
+<p>Podemos actualizar esta política cuando sea necesario. La fecha de la última actualización aparece al inicio de esta página.</p>
 
 <h2>9. Contacto</h2>
-<p>Para dudas sobre privacidad o para solicitar la eliminacion de tus datos, escribe a: <strong>comissariadocarpinteros@gmail.com</strong></p>
+<p>Para dudas sobre privacidad o para solicitar la eliminación de tus datos, escribe a: <strong>comissariadocarpinteros@gmail.com</strong></p>
 
-<footer>Turnos de Pozo - Gestion de Pozos Comunitarios. Uso comunitario.</footer>
+<footer>Turnos de Pozo - Gestión de Pozos Comunitarios. Uso comunitario.</footer>
 </body>
 </html>"""
 

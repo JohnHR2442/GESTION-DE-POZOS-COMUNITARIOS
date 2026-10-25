@@ -82,7 +82,7 @@ export default function ContadorMultas() {
     setFormError("");
     const montoNum = parseFloat(monto);
     if (!socioId || !descripcion.trim() || isNaN(montoNum) || montoNum <= 0) {
-      setFormError("Completa socio, descripcion y un monto valido.");
+      setFormError("Completa socio, descripción y un monto válido.");
       return;
     }
     setSaving(true);
@@ -139,7 +139,7 @@ export default function ContadorMultas() {
         </Pressable>
         {open ? (
           <View style={[styles.cardBody, { borderTopColor: colors.divider }]}>
-            <Text style={[styles.bodyLabel, { color: colors.muted }]}>Descripcion</Text>
+            <Text style={[styles.bodyLabel, { color: colors.muted }]}>Descripción</Text>
             <Text style={[styles.bodyValue, { color: colors.onSurface }]}>{m.descripcion}</Text>
             {pagado ? (
               <>
@@ -191,7 +191,7 @@ export default function ContadorMultas() {
           <Feather name="chevron-down" size={20} color={colors.muted} />
         </Pressable>
 
-        <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Descripcion</Text>
+        <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Descripción</Text>
         <TextInput testID="input-descripcion" value={descripcion} onChangeText={setDescripcion} placeholder="Motivo de la multa" placeholderTextColor={colors.muted} style={[styles.input, { backgroundColor: colors.surfaceTertiary, color: colors.onSurface, borderColor: colors.border }]} />
 
         <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Monto (MXN)</Text>
@@ -221,7 +221,7 @@ export default function ContadorMultas() {
         <Text style={{ color: colors.onSurface, fontSize: fontSize.lg, marginBottom: spacing.lg }}>
           Eliminar la multa de {deleteTarget?.socio_nombre} por {deleteTarget ? formatMXN(deleteTarget.monto) : ""}?
         </Text>
-        <Button title="Si, eliminar" variant="danger" onPress={confirmarEliminar} testID="btn-confirm-delete" />
+        <Button title="Sí, eliminar" variant="danger" onPress={confirmarEliminar} testID="btn-confirm-delete" />
         <Button title="Cancelar" variant="secondary" onPress={() => setDeleteTarget(null)} style={{ marginTop: spacing.sm }} />
       </AppModal>
     </View>

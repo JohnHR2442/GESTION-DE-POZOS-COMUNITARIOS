@@ -53,7 +53,7 @@ export default function ContadorRecorrido() {
   const flash = (t: string) => { setBanner(t); setTimeout(() => setBanner(null), 3500); };
 
   const openDay = (d: DiaCalendario) => {
-    if (d.festivo && !dssMap[d.fecha]) { flash("Ese dia ya es festivo"); return; }
+    if (d.festivo && !dssMap[d.fecha]) { flash("Ese día ya es festivo"); return; }
     setSelDia(d); setTipo("turno_caido"); setMotivo(""); setStep("choose");
   };
   const close = () => setSelDia(null);
@@ -91,7 +91,7 @@ export default function ContadorRecorrido() {
             <Text style={styles.bannerText}>{banner}</Text>
           </View>
         ) : null}
-        <Text style={[styles.hint, { color: colors.muted }]}>Toca un dia para registrar o quitar un recorrido (dia sin servicio). La rotacion de turnos se recorre automaticamente.</Text>
+        <Text style={[styles.hint, { color: colors.muted }]}>Toca un día para registrar o quitar un recorrido (día sin servicio). La rotación de turnos se recorre automáticamente.</Text>
         <Text style={[styles.section, { color: colors.onSurface }]}>{capitalize(nombreMes(month))} {year}</Text>
         {loading ? (
           <ActivityIndicator color={accent} style={{ marginTop: spacing.lg }} />
@@ -99,7 +99,7 @@ export default function ContadorRecorrido() {
           <View style={[styles.calCard, { backgroundColor: colors.surfaceSecondary }]}>
             <Calendar dias={dias} accent={accent} onDayPress={openDay} />
             <View style={styles.legend}>
-              <Legend color={colors.success} label="Turno caido" />
+              <Legend color={colors.success} label="Turno caído" />
               <Legend color={colors.error} label="Emergencia / festivo" />
             </View>
           </View>
@@ -109,15 +109,15 @@ export default function ContadorRecorrido() {
       <AppModal visible={!!selDia} onClose={close} title={selDia ? formatFecha(selDia.fecha) : ""}>
         {yaMarcado ? (
           <>
-            <Text style={[styles.hint, { color: colors.muted }]}>Este dia ya tiene un recorrido registrado.</Text>
+            <Text style={[styles.hint, { color: colors.muted }]}>Este día ya tiene un recorrido registrado.</Text>
             <Button title="Quitar recorrido" onPress={quitar} disabled={working} icon={<Feather name="trash-2" size={18} color="#FFFFFF" />} style={{ backgroundColor: colors.error }} />
           </>
         ) : step === "choose" ? (
           <>
-            <Text style={[styles.hint, { color: colors.muted }]}>¿Por que es el recorrido?</Text>
+            <Text style={[styles.hint, { color: colors.muted }]}>¿Por qué es el recorrido?</Text>
             <Pressable testID="tipo-turno-caido" onPress={() => { setTipo("turno_caido"); setStep("confirm"); }} style={[styles.opt, { backgroundColor: colors.success + "22" }]}>
               <Feather name="check-circle" size={22} color={colors.success} />
-              <Text style={[styles.optLabel, { color: colors.onSurface }]}>Turno caido</Text>
+              <Text style={[styles.optLabel, { color: colors.onSurface }]}>Turno caído</Text>
               <Feather name="chevron-right" size={20} color={colors.muted} />
             </Pressable>
             <Pressable testID="tipo-emergencia" onPress={() => { setTipo("emergencia"); setStep("confirm"); }} style={[styles.opt, { backgroundColor: colors.errorSoft }]}>
@@ -129,13 +129,13 @@ export default function ContadorRecorrido() {
         ) : (
           <>
             <Text style={[styles.confirmText, { color: colors.onSurface }]}>
-              ¿Seguro que quieres ese dia{" "}
+              ¿Seguro que quieres ese día{" "}
               <Text style={{ color: tipoColor, fontWeight: "800" }}>{selDia ? formatFecha(selDia.fecha) : ""}</Text>?
             </Text>
             {tipo === "emergencia" ? (
               <TextInput
                 testID="motivo-input"
-                placeholder="Escribe la razon de la emergencia"
+                placeholder="Escribe la razón de la emergencia"
                 placeholderTextColor={colors.muted}
                 value={motivo}
                 onChangeText={setMotivo}

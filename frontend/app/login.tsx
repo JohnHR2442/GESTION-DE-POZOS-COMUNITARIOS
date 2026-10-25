@@ -40,7 +40,7 @@ export default function Login() {
   const handleLogin = async () => {
     setError("");
     if (!email.trim() || !password) {
-      setError("Ingresa tu correo y contrasena.");
+      setError("Ingresa tu correo y contraseña.");
       return;
     }
     setLoading(true);
@@ -64,7 +64,7 @@ export default function Login() {
         <View style={[styles.logo, { backgroundColor: accent }]}>
           <Feather name="droplet" size={36} color="#FFFFFF" />
         </View>
-        <Text style={[styles.title, { color: colors.onSurface }]}>Iniciar sesion</Text>
+        <Text style={[styles.title, { color: colors.onSurface }]}>Iniciar sesión</Text>
         {pozo ? (
           <View style={[styles.pozoTag, { backgroundColor: accent + "22" }]}>
             <View style={[styles.dot, { backgroundColor: accent }]} />
@@ -72,7 +72,7 @@ export default function Login() {
           </View>
         ) : null}
 
-        <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Correo electronico</Text>
+        <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Correo electrónico</Text>
         <TextInput
           testID="input-email"
           value={email}
@@ -84,13 +84,13 @@ export default function Login() {
           style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.onSurface, borderColor: colors.border }]}
         />
 
-        <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Contrasena</Text>
+        <Text style={[styles.label, { color: colors.onSurfaceTertiary }]}>Contraseña</Text>
         <View style={[styles.passRow, { backgroundColor: colors.surfaceSecondary, borderColor: colors.border }]}>
           <TextInput
             testID="input-password"
             value={password}
             onChangeText={setPassword}
-            placeholder="Escribe tu contrasena"
+            placeholder="Escribe tu contraseña"
             placeholderTextColor={colors.muted}
             secureTextEntry={!showPass}
             style={[styles.passInput, { color: colors.onSurface }]}
@@ -105,7 +105,7 @@ export default function Login() {
 
         <Button title="Entrar" testID="btn-login" onPress={handleLogin} loading={loading} color={accent} style={{ marginTop: spacing.lg }} />
         <Pressable onPress={() => router.push("/recuperar")} testID="btn-forgot" style={styles.forgot} hitSlop={8}>
-          <Text style={[styles.forgotText, { color: accent }]}>Se me olvido la contrasena</Text>
+          <Text style={[styles.forgotText, { color: accent }]}>Se me olvidó la contraseña</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
