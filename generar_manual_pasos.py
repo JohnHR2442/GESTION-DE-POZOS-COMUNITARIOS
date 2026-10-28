@@ -261,7 +261,7 @@ tabla(["Requisito", "Descripción"],
 S = "/app/manual_pasos/"
 
 
-def paso_img(n, texto, arch, titulo, alto=10.0):
+def paso_img(n, texto, arch, titulo, alto=7.3):
     num = fig_n[0] + 1
     par = doc.add_paragraph()
     par.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
