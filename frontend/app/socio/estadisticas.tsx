@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather } from "@expo/vector-icons";
+import Feather from "@react-native-vector-icons/feather";
 import { useFocusEffect } from "expo-router";
 import { BarChart, PieChart } from "react-native-chart-kit";
 import { api } from "@/src/api/client";

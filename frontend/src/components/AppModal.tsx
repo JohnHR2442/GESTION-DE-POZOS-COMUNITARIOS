@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import Feather from "@react-native-vector-icons/feather";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { spacing, radius, fontSize } from "@/src/theme/colors";
 

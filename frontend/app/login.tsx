@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather } from "@expo/vector-icons";
+import Feather from "@react-native-vector-icons/feather";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth, Pozo } from "@/src/auth/AuthContext";
 import { useTheme } from "@/src/theme/ThemeContext";

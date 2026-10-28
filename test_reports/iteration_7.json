@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only regression smoke test after the Expo SDK 58 upgrade (installed: expo 58.0.21, RN 0.88.0, expo-router 58.0.28, react 19.3.0, @react-native-vector-icons/feather 14.0.0), run at 390x844 on http://localhost:3000 against the PRODUCTION backend. All requested flows PASS. The Feather font loads (document.fonts reports Feather:loaded) and glyphs render on Home (droplet, check-circle on the selected pozo, log-in, users), on the public list (phone, refresh, bell-off), on socio Inicio, on the 4 action cards and on both tab bars. Pozo selection, the public screen (9 socios, refresh, back), socio login, Turno de hoy, the 31-day calendar, opening and closing the emergencia and notificaciones modals, the Estadísticas KPIs, the Historial month dropdown (10 options, selection works), the Perfil dark-mode toggle (on, then off again), logout, contador login, the Multas list (empty state), opening and closing the Nueva multa form, the Recorrido calendar and all tab navigation work. No console errors, no page errors, no red screens. No @expo/vector-icons, expo-av or expo-barcode-scanner left in app/ or src/. Limitation: production has 0 multas in all 3 pozos, so the react-native-chart-kit charts on Estadísticas show their empty-state placeholders and the charts drawn with data could not be checked without writing data.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Bottom tab bar (socio and contador)", "issue": "Tab labels are cut off at the bottom at 390x844 (half of 'Inicio', 'Multas', etc. visible). This was already present before the upgrade (flagged in iteration_6).", "testID": "n/a", "priority": "low"}
+    ],
+    "integration_issues": [
+      {"flow": "Login -> push registration on web", "issue": "After each login the app automatically sends POST /api/push/register to the production backend from the web preview, because headless Chromium returns a push token. This writes web/test installation records to production. It is existing app behavior, not caused by the upgrade. Reference: frontend/src/notifications/push.ts:59-73", "affected_testIDs": ["btn-login"]}
+    ],
+    "design_issues": [
+      {"screen": "Notificaciones modal", "issues": ["Button text 'Marcar todas como leidas' is missing its accent (should be 'leídas'). Reference: frontend/src/components/NotificacionesModal.tsx:39"]}
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": [".screenshots/home.png", ".screenshots/public.png", ".screenshots/inicio.png", ".screenshots/stats.png", ".screenshots/recorrido.png", ".screenshots/multa_form.png"],
+  "action_items": [
+    "Optional: fix 'Marcar todas como leidas' -> 'Marcar todas como leídas' (src/components/NotificacionesModal.tsx:39)",
+    "Optional: skip registrarPush when Platform.OS === 'web' so the preview stops writing push registrations to production",
+    "Optional: fix the clipped bottom tab labels (tabBarStyle height in app/socio/_layout.tsx:27 and app/contador/_layout.tsx:26)"
+  ],
+  "critical_code_review_comments": [
+    "Migration is clean: all icon imports use @react-native-vector-icons/feather, and use-icon-fonts.ts passes an empty map on web and native builds (CDN load only under Expo Go). FEATHER_VERSION 14.0.0 matches the installed package.",
+    "After logout the Stack keeps the earlier index screen mounted, so data-testid='pozo-card-*' appears twice in the DOM (one hidden). Tests must use :visible. This does not affect users."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (not requested)", "frontend": "100% of requested flows (charts with data not verifiable: no multas data in production)"},
+  "seed_data_creation": "None. Only login POSTs were sent, plus the automatic /api/push/register the app makes after login.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Preview frontend uses EXPO_PUBLIC_API_URL = production backend on Render. Use :visible selectors after logout (old stack screen stays mounted). Production has no multas, so chart-kit charts show empty states. Socio tabs use role=tab with names Inicio, Estadísticas, Historial, Perfil; contador tabs are Multas, Recorrido, Perfil."
+}

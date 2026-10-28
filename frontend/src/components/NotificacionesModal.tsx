@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import Feather from "@react-native-vector-icons/feather";
 import { AppModal } from "./AppModal";
 import { Button } from "./Button";
 import { useTheme } from "@/src/theme/ThemeContext";
@@ -36,7 +36,7 @@ export function NotificacionesModal({ visible, onClose }: { visible: boolean; on
         </View>
       ) : (
         <>
-          <Button title="Marcar todas como leidas" variant="secondary" onPress={markAll} testID="notif-mark-all" style={{ marginBottom: spacing.md }} />
+          <Button title="Marcar todas como leídas" variant="secondary" onPress={markAll} testID="notif-mark-all" style={{ marginBottom: spacing.md }} />
           <FlatList
             data={items}
             scrollEnabled={false}

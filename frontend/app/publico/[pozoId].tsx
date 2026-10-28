@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, FlatList, Pressable, RefreshControl, Platform, Linking, ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather } from "@expo/vector-icons";
+import Feather from "@react-native-vector-icons/feather";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { api } from "@/src/api/client";

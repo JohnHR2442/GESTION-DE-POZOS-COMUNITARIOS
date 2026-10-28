@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather } from "@expo/vector-icons";
+import Feather from "@react-native-vector-icons/feather";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useNotifications } from "@/src/notifications/NotificationsContext";
 import { NotificacionesModal } from "./NotificacionesModal";
