@@ -74,3 +74,7 @@ MXN, fechas DD/MM/YYYY. Codigo limpio sin trazas de Emergent/IA.
 - Verificado en vivo: /api/ health, /api/pozos, login contador@isidro.com, /api/pozos/isidro/socios y app cargando desde Render.
 - Nota: Render free "duerme" tras ~15 min; el scheduler de festivos puede no dispararse si esta dormido. Solucion opcional: keep-alive/cron ping o plan de pago.
 - Pendiente del usuario: generar build Android (Emergent Publish -> Publish to Play Store) e instalar en telefono para probar push.
+
+## Actualización: Manual con dos pasos por hoja
+- Manual de usuario compactado (55 → 36 páginas): capturas a 6.3 cm de alto, dos pasos por hoja, índices con páginas actualizadas.
+- Scripts: /app/manual_dos_por_hoja.py, /app/manual_actualizar_indices.py. Descarga: /api/manual-pasos

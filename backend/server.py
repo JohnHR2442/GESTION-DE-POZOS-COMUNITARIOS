@@ -1170,7 +1170,7 @@ async def root():
     return {"message": "Turnos de Pozo API", "status": "ok"}
 
 
-@api.get("/reporte-residencia")
+@api.api_route("/reporte-residencia", methods=["GET", "HEAD"])
 async def reporte_residencia():
     return FileResponse(
         "/app/Reporte_Residencia_Pozos.docx",
@@ -1179,7 +1179,7 @@ async def reporte_residencia():
     )
 
 
-@api.get("/figura-3-1")
+@api.api_route("/figura-3-1", methods=["GET", "HEAD"])
 async def figura_3_1():
     return FileResponse(
         "/app/figura_3_1.png",
@@ -1188,7 +1188,7 @@ async def figura_3_1():
     )
 
 
-@api.get("/figura-3-2")
+@api.api_route("/figura-3-2", methods=["GET", "HEAD"])
 async def figura_3_2():
     return FileResponse(
         "/app/figura_3_2.png",
@@ -1209,7 +1209,7 @@ async def figura_4(n: str):
     return FileResponse(f"/app/{archivo}", media_type="image/png", filename=nombre)
 
 
-@api.get("/tabla-4-1")
+@api.api_route("/tabla-4-1", methods=["GET", "HEAD"])
 async def tabla_4_1():
     return FileResponse(
         "/app/tabla_4_1.png",
@@ -1218,7 +1218,7 @@ async def tabla_4_1():
     )
 
 
-@api.get("/tablas-variables")
+@api.api_route("/tablas-variables", methods=["GET", "HEAD"])
 async def tablas_variables():
     return FileResponse(
         "/app/Tablas_Variables_Hipotesis.docx",
@@ -1227,7 +1227,7 @@ async def tablas_variables():
     )
 
 
-@api.get("/capitulo-3")
+@api.api_route("/capitulo-3", methods=["GET", "HEAD"])
 async def capitulo_3():
     return FileResponse(
         "/app/Capitulo_III_Marco_Metodologico.docx",
@@ -1236,7 +1236,7 @@ async def capitulo_3():
     )
 
 
-@api.get("/requerimientos-resultados")
+@api.api_route("/requerimientos-resultados", methods=["GET", "HEAD"])
 async def requerimientos_resultados():
     return FileResponse(
         "/app/Requerimientos_y_Resultados.docx",
@@ -1245,7 +1245,7 @@ async def requerimientos_resultados():
     )
 
 
-@api.get("/punto-412")
+@api.api_route("/punto-412", methods=["GET", "HEAD"])
 async def punto_412():
     return FileResponse(
         "/app/Punto_4-1-2_Eficacia_Eficiencia_Usabilidad.docx",
@@ -1254,7 +1254,7 @@ async def punto_412():
     )
 
 
-@api.get("/tesis-indices")
+@api.api_route("/tesis-indices", methods=["GET", "HEAD"])
 async def tesis_indices():
     return FileResponse(
         "/app/Tesis_con_indices.docx",
@@ -1263,7 +1263,7 @@ async def tesis_indices():
     )
 
 
-@api.get("/organigrama")
+@api.api_route("/organigrama", methods=["GET", "HEAD"])
 async def organigrama():
     return FileResponse(
         "/app/organigrama_comisariado.png",
@@ -1272,7 +1272,7 @@ async def organigrama():
     )
 
 
-@api.get("/cronograma")
+@api.api_route("/cronograma", methods=["GET", "HEAD"])
 async def cronograma():
     return FileResponse(
         "/app/Cronograma_Residencia.docx",
@@ -1281,7 +1281,7 @@ async def cronograma():
     )
 
 
-@api.get("/tesis-final")
+@api.api_route("/tesis-final", methods=["GET", "HEAD"])
 async def tesis_final():
     return FileResponse(
         "/app/Tesis_Final.docx",
@@ -1290,7 +1290,7 @@ async def tesis_final():
     )
 
 
-@api.get("/manual-usuario")
+@api.api_route("/manual-usuario", methods=["GET", "HEAD"])
 async def manual_usuario():
     return FileResponse(
         "/app/Manual_de_Usuario_Turnos_de_Pozo.docx",
@@ -1299,7 +1299,7 @@ async def manual_usuario():
     )
 
 
-@api.get("/competencias")
+@api.api_route("/competencias", methods=["GET", "HEAD"])
 async def competencias():
     return FileResponse(
         "/app/Competencias_Desarrolladas.docx",
@@ -1308,7 +1308,7 @@ async def competencias():
     )
 
 
-@api.get("/tesis-corregida")
+@api.api_route("/tesis-corregida", methods=["GET", "HEAD"])
 async def tesis_corregida():
     return FileResponse(
         "/app/Tesis_Corregida.docx",
@@ -1317,7 +1317,7 @@ async def tesis_corregida():
     )
 
 
-@api.get("/manual-referenciado")
+@api.api_route("/manual-referenciado", methods=["GET", "HEAD"])
 async def manual_referenciado():
     return FileResponse(
         "/app/Manual_de_Usuario_Referenciado.docx",
@@ -1326,7 +1326,7 @@ async def manual_referenciado():
     )
 
 
-@api.get("/tesis-anexo")
+@api.api_route("/tesis-anexo", methods=["GET", "HEAD"])
 async def tesis_anexo():
     return FileResponse(
         "/app/Tesis_con_Anexo_Manual.docx",
@@ -1335,7 +1335,7 @@ async def tesis_anexo():
     )
 
 
-@api.get("/glosario")
+@api.api_route("/glosario", methods=["GET", "HEAD"])
 async def glosario():
     return FileResponse(
         "/app/Glosario_de_Terminos.docx",
@@ -1344,7 +1344,7 @@ async def glosario():
     )
 
 
-@api.get("/manual-pasos")
+@api.api_route("/manual-pasos", methods=["GET", "HEAD"])
 async def manual_pasos():
     return FileResponse(
         "/app/Manual_de_Usuario_Pasos.docx",
@@ -1353,7 +1353,7 @@ async def manual_pasos():
     )
 
 
-@api.get("/tesis-formato")
+@api.api_route("/tesis-formato", methods=["GET", "HEAD"])
 async def tesis_formato():
     return FileResponse(
         "/app/Tesis_Formateada.docx",
