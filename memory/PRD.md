@@ -78,3 +78,10 @@ MXN, fechas DD/MM/YYYY. Codigo limpio sin trazas de Emergent/IA.
 ## Actualización: Manual con dos pasos por hoja
 - Manual de usuario compactado (55 → 36 páginas): capturas a 6.3 cm de alto, dos pasos por hoja, índices con páginas actualizadas.
 - Scripts: /app/manual_dos_por_hoja.py, /app/manual_actualizar_indices.py. Descarga: /api/manual-pasos
+
+## Actualización: Calendario navegable (oct 2026)
+- Inicio (socio): flechas + deslizar izquierda/derecha para cambiar de mes sin límite; tocar un día muestra debajo la fecha y el socio en turno (o Sin servicio / Día festivo). Turno de hoy siempre del mes actual.
+- Historial: calendario del mes completo debajo de la lista (punto azul = tu turno) y también en el PDF exportado.
+- Backend sin cambios (usa /api/turnos/calendario). Requiere nuevo build para Google Play.
+- Pendiente menor: arrastre corto en web puede seleccionar un día.
+

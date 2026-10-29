@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Feather from "@react-native-vector-icons/feather";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { api, apiErrorMessage } from "@/src/api/client";
 import { useAuth } from "@/src/auth/AuthContext";
 import { useTheme } from "@/src/theme/ThemeContext";
@@ -32,9 +33,13 @@ export default function SocioInicio() {
   const accent = pozo?.accent || colors.brand;
 
   const now = new Date();
-  const [year] = useState(now.getFullYear());
-  const [month] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth() + 1);
   const [dias, setDias] = useState<DiaCalendario[]>([]);
+  const [turnoHoy, setTurnoHoy] = useState<DiaCalendario | undefined>();
+  const [seleccionado, setSeleccionado] = useState<DiaCalendario | null>(null);
+  const turnoHoyCargado = useRef(false);
+  const ultimoPedido = useRef(0);
   const [loading, setLoading] = useState(true);
   const [showEmergencia, setShowEmergencia] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
@@ -42,9 +47,21 @@ export default function SocioInicio() {
   const [working, setWorking] = useState(false);
 
   const load = useCallback(async () => {
+    const pedido = ++ultimoPedido.current;
     try {
       const cal = await api.get("/turnos/calendario", { params: { year, month } });
+      if (pedido !== ultimoPedido.current) return; // llegó una respuesta de un mes anterior
       setDias(cal.data.dias);
+      // El turno de hoy siempre se toma del mes actual, aunque se vea otro mes
+      const hoyIso = localTodayIso();
+      const hoy = (cal.data.dias as DiaCalendario[]).find((d) => d.fecha === hoyIso);
+      if (hoy) setTurnoHoy(hoy);
+      else if (!turnoHoyCargado.current) {
+        const t = new Date();
+        const actual = await api.get("/turnos/calendario", { params: { year: t.getFullYear(), month: t.getMonth() + 1 } });
+        setTurnoHoy((actual.data.dias as DiaCalendario[]).find((d) => d.fecha === hoyIso));
+      }
+      turnoHoyCargado.current = true;
     } catch {
       // silencioso
     } finally {
@@ -54,13 +71,28 @@ export default function SocioInicio() {
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  const cambiarMes = useCallback((delta: number) => {
+    setSeleccionado(null);
+    const total = year * 12 + (month - 1) + delta;
+    setYear(Math.floor(total / 12));
+    setMonth((total % 12) + 1);
+  }, [year, month]);
+
+  // Deslizar a la izquierda = mes siguiente; a la derecha = mes anterior
+  const swipe = Gesture.Pan()
+    .runOnJS(true)
+    .activeOffsetX([-25, 25])
+    .failOffsetY([-15, 15])
+    .onEnd((e) => {
+      if (e.translationX < -50) cambiarMes(1);
+      else if (e.translationX > 50) cambiarMes(-1);
+    });
+
   const flash = (text: string) => {
     setBanner(text);
     setTimeout(() => setBanner(null), 3500);
   };
 
-  const todayIso = localTodayIso();
-  const turnoHoy = dias.find((d) => d.fecha === todayIso);
 
   const reportarEmergencia = async (tipo: string, label: string) => {
     setWorking(true);
@@ -115,18 +147,44 @@ export default function SocioInicio() {
           ))}
         </View>
 
-        <Text style={[styles.section, { color: colors.onSurface }]}>{capitalize(nombreMes(month))} {year}</Text>
+        <View style={styles.monthRow}>
+          <Pressable onPress={() => cambiarMes(-1)} testID="mes-anterior" hitSlop={8} style={[styles.monthBtn, { backgroundColor: colors.surfaceSecondary }]}>
+            <Feather name="chevron-left" size={22} color={colors.onSurface} />
+          </Pressable>
+          <Text style={[styles.monthTitle, { color: colors.onSurface }]} testID="mes-titulo">{capitalize(nombreMes(month))} {year}</Text>
+          <Pressable onPress={() => cambiarMes(1)} testID="mes-siguiente" hitSlop={8} style={[styles.monthBtn, { backgroundColor: colors.surfaceSecondary }]}>
+            <Feather name="chevron-right" size={22} color={colors.onSurface} />
+          </Pressable>
+        </View>
         {loading ? (
           <ActivityIndicator color={accent} style={{ marginTop: spacing.lg }} />
         ) : (
-          <View style={[styles.calCard, { backgroundColor: colors.surfaceSecondary }]}>
-            <Calendar dias={dias} accent={accent} highlightSocioId={user?.id} />
-            <View style={styles.legend}>
-              <Legend color={accent} label="Tu turno" />
-              <Legend color={colors.success} label="Turno caído" />
-              <Legend color={colors.error} label="Emergencia / festivo" />
+          <GestureDetector gesture={swipe}>
+            <View style={[styles.calCard, { backgroundColor: colors.surfaceSecondary }]} testID="calendario-inicio">
+              <Calendar dias={dias} accent={accent} highlightSocioId={user?.id} selectedFecha={seleccionado?.fecha} onDayPress={setSeleccionado} />
+              <View style={styles.legend}>
+                <Legend color={accent} label="Tu turno" />
+                <Legend color={colors.success} label="Turno caído" />
+                <Legend color={colors.error} label="Emergencia / festivo" />
+              </View>
+              <View style={[styles.selBox, { borderColor: colors.border }]} testID="dia-seleccionado">
+                {seleccionado ? (
+                  <>
+                    <Text style={[styles.selFecha, { color: colors.muted }]}>{formatFecha(seleccionado.fecha)}</Text>
+                    <Text style={[styles.selNombre, { color: colors.onSurface }]} testID="dia-seleccionado-nombre">
+                      {seleccionado.sin_servicio
+                        ? `Sin servicio${seleccionado.motivo ? ` (${seleccionado.motivo.replace(/\bcaido\b/gi, (m) => (m[0] === "C" ? "Caído" : "caído"))})` : ""}`
+                        : seleccionado.festivo
+                          ? "Día festivo"
+                          : seleccionado.socio_nombre || "Sin asignar"}
+                    </Text>
+                  </>
+                ) : (
+                  <Text style={[styles.selFecha, { color: colors.muted }]}>Toca un día para ver a quién le toca. Desliza para cambiar de mes.</Text>
+                )}
+              </View>
             </View>
-          </View>
+          </GestureDetector>
         )}
       </ScrollView>
 
@@ -172,7 +230,12 @@ const styles = StyleSheet.create({
   actionCard: { width: "47.5%", borderRadius: radius.md, borderWidth: 1, padding: spacing.lg, alignItems: "flex-start", gap: spacing.md, minHeight: 110 },
   actionIcon: { width: 48, height: 48, borderRadius: radius.md, alignItems: "center", justifyContent: "center" },
   actionLabel: { fontSize: fontSize.lg, fontWeight: "700" },
-  section: { fontSize: fontSize.lg, fontWeight: "700", marginTop: spacing.xl, marginBottom: spacing.md },
+  monthRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: spacing.xl, marginBottom: spacing.md },
+  monthBtn: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  monthTitle: { fontSize: fontSize.lg, fontWeight: "700" },
+  selBox: { marginTop: spacing.md, paddingTop: spacing.md, paddingHorizontal: spacing.xs, borderTopWidth: 1, minHeight: 56, justifyContent: "center" },
+  selFecha: { fontSize: fontSize.sm },
+  selNombre: { fontSize: fontSize.lg, fontWeight: "700", marginTop: 2 },
   calCard: { borderRadius: radius.lg, padding: spacing.md },
   legend: { flexDirection: "row", gap: spacing.lg, marginTop: spacing.md, paddingLeft: spacing.xs },
   legendItem: { flexDirection: "row", alignItems: "center", gap: spacing.xs },

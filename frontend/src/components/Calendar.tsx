@@ -20,6 +20,7 @@ interface Props {
   dias: DiaCalendario[];
   accent: string;
   highlightSocioId?: string | null;
+  selectedFecha?: string | null;
   onDayPress?: (dia: DiaCalendario) => void;
 }
 
@@ -30,7 +31,7 @@ function mondayIndex(jsDay: number): number {
   return (jsDay + 6) % 7;
 }
 
-export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) {
+export function Calendar({ dias, accent, highlightSocioId, selectedFecha, onDayPress }: Props) {
   const { colors } = useTheme();
   if (!dias.length) return null;
 
@@ -61,6 +62,7 @@ export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) 
           if (!d) return <View key={`e${i}`} style={styles.cell} />;
           const isMine = highlightSocioId && d.socio_id === highlightSocioId;
           const isToday = d.fecha === todayIso;
+          const isSel = d.fecha === selectedFecha;
           // Verde = turno caido; Rojo = emergencia o festivo
           const esVerde = d.sin_servicio && d.tipo === "turno_caido";
           const esRojo = d.festivo || (d.sin_servicio && d.tipo !== "turno_caido");
@@ -72,13 +74,14 @@ export function Calendar({ dias, accent, highlightSocioId, onDayPress }: Props) 
               key={d.fecha}
               testID={`dia-${d.fecha}`}
               onPress={() => press(d)}
+              disabled={!onDayPress}
               style={[
                 styles.cell,
                 styles.dayCell,
                 {
-                  backgroundColor: bg,
-                  borderColor: isToday ? accent : colors.border,
-                  borderWidth: isToday ? 2 : 1,
+                  backgroundColor: isSel ? accent + "33" : bg,
+                  borderColor: isToday || isSel ? accent : colors.border,
+                  borderWidth: isToday || isSel ? 2 : 1,
                 },
               ]}
             >

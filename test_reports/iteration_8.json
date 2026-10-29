@@ -1,0 +1,36 @@
+{
+  "summary": "Frontend-only test of the Inicio month calendar (swipe, buttons, day tap) and the Historial calendar plus PDF. Viewport 390x844, preview web, backend = production Render (EXPO_PUBLIC_API_URL). Browser clock is 2026-10-29. All requested flows pass: socio login lands on /socio/inicio. mes-titulo shows 'Octubre 2026'. mes-siguiente and mes-anterior have no limit: +13 months reached Noviembre 2027 and -14 reached Septiembre 2026, crossing the Dec to Jan year boundary both ways, with a correct GET /api/turnos/calendario?year&month on each change. A mouse drag on calendario-inicio of 200px left goes to the next month and 200px right goes to the previous month. Drags under 50px and vertical drags do not change the month, and wheel scrolling still works. turno-hoy-card stays 'Sin servicio' (today 29/10 is turno caído) in every month. Tapping a day highlights it and shows the date and name in dia-seleccionado-nombre with no modal, for example '05/10/2026 | Alfredo Velez', '29/10/2026 | Sin servicio (Turno caido)' and '15/09/2026 | Día festivo'. The selection clears when the month changes. Historial keeps its list (3 turns in Oct, 4 in Sep). historial-calendario sits below the list, with blue accent dots on the user's days and the 3-item legend. Changing the month in the dropdown re-fetches /historial and /turnos/calendario and updates both the list and the calendar. btn-export-pdf calls window.print once with no JS error. Contador smoke test passed: login, then Multas, Recorrido and Perfil tabs, no page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Inicio calendar month change", "issue": "cambiarMes sets loading=true and swaps the whole calendar card for an ActivityIndicator (inicio.tsx:157-186). On every swipe or arrow tap the card unmounts, the ScrollView content shrinks and the scroll position jumps, so the user has to scroll back down after each swipe. There is also a visible flicker.", "testID": "calendario-inicio", "priority": "MEDIUM"},
+      {"component": "Inicio day selection during drag (web)", "issue": "A short horizontal drag under the 50px swipe threshold (e.g. 40px) on web also fires the day Pressable's onPress and selects a day. This is minor and probably acceptable.", "testID": "dia-YYYY-MM-DD", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Historial calendar", "issues": ["Calendar cells are still Pressable (Calendar.tsx:73) even though onDayPress is not passed in Historial, so they are focusable and tappable but do nothing. The Historial calendar also has no day-name display, which is acceptable per the spec."]},
+      {"screen": "Inicio", "issues": ["Backend motivo text 'Turno caido' is missing its accent ('caído'). It shows in dia-seleccionado-nombre as 'Sin servicio (Turno caido)'."]}
+    ],
+    "react_native_issues": [
+      {"component": "expo-print on web", "issue": "On web, expo-print 58 (ExponentPrint.web.js) ignores the html argument and calls window.print() on the current screen. In the web preview, the PDF therefore does not contain the generated HTML table or calendar. Native iOS/Android render the HTML correctly. Reference: /app/frontend/app/socio/historial.tsx:101"}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Inicio: keep the Calendar mounted while loading the next month, either with an overlay spinner or by keeping the old dias until the new data arrives. This avoids the scroll jump and flicker on each swipe.",
+    "Optional: guard against out-of-order responses when months are changed quickly, e.g. ignore a response if year/month changed meanwhile.",
+    "Optional, web only: for an HTML PDF export on web, render the html in a hidden iframe and call print on it, or use Print.printToFileAsync on native only."
+  ],
+  "critical_code_review_comments": [
+    "inicio.tsx: if the calendario request fails, dias keeps the previous month's data while mes-titulo shows the new month, and the error is swallowed silently. Consider showing an error or retry state.",
+    "inicio.tsx: Gesture.Pan() is re-created on every render without useMemo. This works but is not ideal.",
+    "historial.tsx calendarioHtml duplicates the color logic of Calendar.tsx (green/red/own). Consider a shared helper so the PDF and the screen do not diverge.",
+    "Duplicate testIDs: dia-YYYY-MM-DD exists in both Inicio and Historial, which are both mounted as tabs. Tests must scope selectors to the container (calendario-inicio / historial-calendario)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (not requested)", "frontend": "100% of requested flows (8/8)"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Preview frontend calls the production backend at gestion-de-pozos-comunitarios.onrender.com. Browser date in the sandbox is 2026-10-29. Scope dia-* selectors to calendario-inicio or historial-calendario. Swipe can be simulated with page.mouse down/move(10 steps)/up over calendario-inicio, since RNGH Pan responds to mouse on web. expo-print on web only calls window.print()."
+}
